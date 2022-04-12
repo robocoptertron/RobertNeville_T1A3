@@ -1,5 +1,7 @@
 #!/bin/bash
 
+TESTED_RUBY_VERSION=3
+
 # Paths used in this script:
 CONFIG_DIR="$HOME/.CLIMate"
 CONFIG_FILE="$CONFIG_DIR/config.json"
@@ -18,6 +20,7 @@ JSON
 }
 
 init_user_locations_file() {
+  echo "Creating $USER_LOCATIONS_FILE..."
   touch $USER_LOCATIONS_FILE
   cat > $USER_LOCATIONS_FILE <<JSON
 { "locations": [] }
@@ -25,6 +28,7 @@ JSON
 }
 
 init_favourites_file() {
+  echo "Creating $FAVOURITES_FILE..."
   touch $FAVOURITES_FILE
   cat > $FAVOURITES_FILE <<JSON
 { "favourites": [] }
@@ -32,10 +36,27 @@ JSON
 }
 
 init_history_file() {
+  echo "Creating $HISTORY_FILE..."
   touch $HISTORY_FILE
   cat > $HISTORY_FILE <<JSON
 []
 JSON
+}
+
+# Creates config files if they do
+# not already exist:
+populate_config_dir() {
+  if [[ ! -e $USER_LOCATIONS_FILE ]]; then
+    init_user_locations_file
+  fi
+
+  if [[ ! -e $FAVOURITES_FILE ]]; then
+    init_favourites_file
+  fi
+
+  if [[ ! -e $HISTORY_FILE ]]; then
+    init_history_file
+  fi
 }
 
 # Function to get user confirmation:
@@ -53,25 +74,42 @@ get_confirmation() {
 }
 
 # Check installed Ruby version:
-version=$(ruby -v | grep -Po "[0-9]+\.[0-9]+\.[0-9]+")
+full_version=$(ruby -v | grep -Eo "[0-9]+\.[0-9]+\.[0-9]+")
+OLD_IFS="$IFS" 
+IFS="."
+read -a version_components <<< "$full_version"
+major_version="${version_components[0]}"
+
+if [[ major_version -lt TESTED_RUBY_VERSION ]]; then
+  echo "WARNING"
+  echo "A version of Ruby less than $TESTED_RUBY_VERSION" 
+  echo "has been detected."
+  echo "CLIMate has only been tested with Ruby 3.0.3, and"
+  echo "some of the functionality may not be compatible"
+  echo "with the version installed on this machine ($full_version)."
+  echo 
+  read -p "Hit ENTER to continue setup, or CTRL+C to abort"
+  echo
+fi
+
+IFS="$OLD_IFS"
 
 # Install bundler and app dependencies:
+echo "Installing app dependencies..."
 gem install bundler
 bundle install
+echo
 
 # Setup config directory
 if [[ ! -e $CONFIG_DIR ]]; then
   echo "Creating config directory: $CONFIG_DIR..."
-  mkdir $CONFIG_DIR
+  mkdir $CONFIG_DIR  
 fi
 
-echo "Initialising config files in $CONFIG_DIR..."
+populate_config_dir
+echo
 
-init_user_locations_file
-init_favourites_file
-init_history_file
-
-echo "CLIMate reports will be exported to $DEFAULT_EXPORTS_DIR by default."
+echo "CLIMate reports are exported to $DEFAULT_EXPORTS_DIR by default."
 
 change_default_export_dir=$(get_confirmation "Would you like to change this? (y/n) ")
 
@@ -98,7 +136,7 @@ else
       if [[ $create_dir == true ]]; then
         # Create the directory and init config file with
         # that directory for exports:
-        mkdir -p $user_specified_exports_location
+        mkdir $user_specified_exports_location
         init_config_file $user_specified_exports_location
         break
       else
@@ -113,13 +151,14 @@ else
       # The user entered a valid directory. Init config
       # file with that directory for exports:
       init_config_file $user_specified_exports_location
+      break
     fi
   done
 fi
 
 echo "All set up!"
 
-launch_app=$(get_confirmation "Would you like to launch climate now? (y/n) ")
+launch_app=$(get_confirmation "Would you like to launch CLIMate now? (y/n) ")
 if [[ $launch_app == true ]]; then 
   ruby ./src/main.rb
 else
