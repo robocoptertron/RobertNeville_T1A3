@@ -76,27 +76,42 @@ echo "CLIMate reports will be exported to $DEFAULT_EXPORTS_DIR by default."
 change_default_export_dir=$(get_confirmation "Would you like to change this? (y/n) ")
 
 if [[ $change_default_export_dir == false && ! -e $DEFAULT_EXPORTS_DIR ]]; then
+  # The user wants to keep the default exports directory.
+  # It does not exist, so create it and initialise config.json
+  # with this directory:
   echo "Creating default exports directory: $DEFAULT_EXPORTS_DIR..."
   init_config_file $DEFAULT_EXPORTS_DIR
   mkdir $DEFAULT_EXPORTS_DIR
 elif [[ $change_default_export_dir == false ]]; then
+  # The user wants to keep the default exports dir.
+  # It already exists:
   echo "$DEFAULT_EXPORTS_DIR already exists. Skipping..."
 else
+  # The user wants to specify their own exports directory
   while true; do
     read -p "Where would you like them to be exported? " user_specified_exports_location
     if [[ ! -e $user_specified_exports_location ]]; then
+      # The location the user entered does not exist.
+      # Confirm creation of the directory:
       echo "The location you entered does not exist..."
       create_dir=$(get_confirmation "Would you like CLIMate to create it? (y/n) ")
       if [[ $create_dir == true ]]; then
+        # Create the directory and init config file with
+        # that directory for exports:
         mkdir -p $user_specified_exports_location
+        init_config_file $user_specified_exports_location
         break
       else
         echo "Please try again."
       fi
     elif [[ ! -d $user_specified_exports_location ]]; then
+      # The user entered a path the represents 
+      # a non-directory file-system object:
       echo "The location you entered is not a directory."
       echo "Please try again."
     else
+      # The user entered a valid directory. Init config
+      # file with that directory for exports:
       init_config_file $user_specified_exports_location
     fi
   done
