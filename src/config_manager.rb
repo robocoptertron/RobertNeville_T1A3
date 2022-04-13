@@ -93,4 +93,20 @@ class ConfigManager
       nil
     end
   end
+
+  def general_config
+    @general_config
+  end
+
+  def user_locations
+    @user_locations
+  end
+
+  def favourites
+    @favourites
+  end
+
+  def history
+    @history
+  end
 end
