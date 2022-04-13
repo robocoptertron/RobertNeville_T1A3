@@ -4,7 +4,6 @@ source "https://rubygems.org"
 
 # gem "rails"
 
-gem "optparse", "~> 0.2.0"
 
 gem "http", "~> 5.0"
 
