@@ -4,7 +4,7 @@ TESTED_RUBY_VERSION=3
 
 # Paths used in this script:
 CONFIG_DIR="$HOME/.CLIMate"
-CONFIG_FILE="$CONFIG_DIR/config.json"
+GENERAL_CONFIG_FILE="$CONFIG_DIR/config.json"
 USER_LOCATIONS_FILE="$CONFIG_DIR/locations.json"
 FAVOURITES_FILE="$CONFIG_DIR/favourites.json"
 HISTORY_FILE="$CONFIG_DIR/history.json"
@@ -12,9 +12,9 @@ DEFAULT_EXPORTS_DIR="$HOME/Documents/CLIMate"
 
 # Functions for initialising config files:
 
-init_config_file() {
-  touch $CONFIG_FILE
-  cat > $CONFIG_FILE <<JSON
+init_general_config_file() {
+  touch $GENERAL_CONFIG_FILE
+  cat > $GENERAL_CONFIG_FILE <<JSON
 { "output": "$1" }
 JSON
 }
@@ -118,7 +118,7 @@ if [[ $change_default_export_dir == false && ! -e $DEFAULT_EXPORTS_DIR ]]; then
   # It does not exist, so create it and initialise config.json
   # with this directory:
   echo "Creating default exports directory: $DEFAULT_EXPORTS_DIR..."
-  init_config_file $DEFAULT_EXPORTS_DIR
+  init_general_config_file $DEFAULT_EXPORTS_DIR
   mkdir $DEFAULT_EXPORTS_DIR
 elif [[ $change_default_export_dir == false ]]; then
   # The user wants to keep the default exports dir.
@@ -150,7 +150,7 @@ else
     else
       # The user entered a valid directory. Init config
       # file with that directory for exports:
-      init_config_file $user_specified_exports_location
+      init_general_config_file $user_specified_exports_location
       break
     fi
   done
