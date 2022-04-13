@@ -194,7 +194,7 @@ class ArgumentParser
         next
       end
 
-      parsed_opt[:arguments] = option_arguments
+      parsed_opt[:args] = option_arguments
 
       @parsed_options.push(parsed_opt)
     end
