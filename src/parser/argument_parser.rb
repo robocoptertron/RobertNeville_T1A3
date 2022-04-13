@@ -7,6 +7,45 @@ class ArgumentParser
     @errors = []
   end
 
+  # Getters
+
+  def parsed_options
+    @parsed_options
+  end
+
+  def parsed_args
+    @parsed_args
+  end
+
+  def errors
+    @errors
+  end
+
+  # Adds option to the list of accepted options.
+  # Parameters:
+  # name -> string representing the name of the option
+  #         and its verbose form.
+  # shorthand -> string representing the shorthand form of an option.
+  # accepts_args -> boolean indicating if the option accepts arguments.
+  # key_value -> boolean indicating if the option can be in key/value form.
+  # groupable -> boolean indicating if the option can be grouped with other options.
+  # min_args -> integer indicating the minimum number of arguments for the option.
+  # max_args -> integer indicating the maximum number of arguments for the option.
+  def add_option(name, shorthand, accepts_args, key_value, groupable, min_args, max_args)
+    @options.push({
+      name: name,
+      shorthand: shorthand,
+      accepts_args: accepts_args,
+      key_value: key_value,
+      groupable: groupable,
+      min_args: min_args,
+      max_args: max_args
+    })
+  end
+
+  # Parses command line arguments, updating
+  # @parsed_args, @parsed_options, and @errors
+  # with the results:
   def exec(argv)
     total_number_of_arguments = argv.length
     current_arg_index = 0
@@ -170,21 +209,7 @@ class ArgumentParser
     end
   end
 
-  def add_option(name, shorthand, accepts_args, key_value, groupable, min_args, max_args)
-    @options.push({
-      name: name,
-      shorthand: shorthand,
-      accepts_args: accepts_args,
-      key_value: key_value,
-      groupable: groupable,
-      min_args: min_args,
-      max_args: max_args
-    })
-  end
-
-  def print_options
-    puts @options
-  end
+  private
 
   def is_option(arg)
     arg[0] == '-'
@@ -224,17 +249,5 @@ class ArgumentParser
   def get_option_by_name(name)
     matching_opts = @options.select { |opt| opt[:name] == name }
     matching_opts[0]
-  end
-
-  def parsed_options
-    @parsed_options
-  end
-
-  def parsed_args
-    @parsed_args
-  end
-
-  def errors
-    @errors
   end
 end
