@@ -124,7 +124,6 @@ elif [[ $change_default_export_dir == false ]]; then
   # The user wants to keep the default exports dir.
   # It already exists:
   init_general_config_file $DEFAULT_EXPORTS_DIR
-  break
 else
   # The user wants to specify their own exports directory
   while true; do
