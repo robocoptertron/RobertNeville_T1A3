@@ -66,9 +66,8 @@ class ArgumentParser
       if current_arg.match(/^-+$/)
         # Only hyphens have been provided.
         # Add error accordingly:
-        @errors.push({
-          message: "An empty option ('#{current_arg}') has been provided."
-        })
+        message = "An empty option ('#{current_arg}') has been provided."
+        @errors.push(message)
         current_arg_index += 1
         next
       end
@@ -89,10 +88,8 @@ class ArgumentParser
             if !self.is_valid_option(parsed_opt[:name])
               # Not a valid option - add error to
               # the list of parsing errors:
-              @errors.push({
-                option: parsed_opt[:name],
-                message: "'#{parsed_opt[:name]}' is not a key/value option."
-              })
+              message = "'#{parsed_opt[:name]}' is not a key/value option."
+              @errors.push(message)
             else
               # Valid option - add option 
               # to the parsed options list:
@@ -119,11 +116,9 @@ class ArgumentParser
         opt_group_array.each_with_index do |opt, i|
           if self.is_valid_option(opt)
             valid_options.push(opt)
-          else 
-            @errors.push({
-              option: opt,
-              message: "'#{opt}' is not a valid option."
-            })
+          else
+            message = "'#{opt}' is not a valid option."
+            @errors.push(message)
           end
         end
 
@@ -156,10 +151,8 @@ class ArgumentParser
         # The argument is an invalid option - add a new
         # error to the list and start analysing the next
         # argument:
-        @errors.push({
-          option: parsed_opt[:name],
-          message: "#{parsed_opt[:name]} is not a valid option."
-        })
+        message = "#{parsed_opt[:name]} is not a valid option."
+        @errors.push(message)
         next
       end
 
@@ -196,10 +189,8 @@ class ArgumentParser
       if option_arguments.length < config_opt[:min_args]
         # The number of arguments provided for the
         # option is less than the minimum required:
-        @errors.push({
-          option: parsed_opt[:name],
-          message: "#{parsed_opt[:name]} requires a minimum of #{config_opt[:min_args]} arguments."
-        })
+        message = "#{parsed_opt[:name]} requires a minimum of #{config_opt[:min_args]} arguments."
+        @errors.push(message)
         next
       end
 
