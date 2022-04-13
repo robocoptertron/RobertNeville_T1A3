@@ -123,7 +123,8 @@ if [[ $change_default_export_dir == false && ! -e $DEFAULT_EXPORTS_DIR ]]; then
 elif [[ $change_default_export_dir == false ]]; then
   # The user wants to keep the default exports dir.
   # It already exists:
-  echo "$DEFAULT_EXPORTS_DIR already exists. Skipping..."
+  init_general_config_file $DEFAULT_EXPORTS_DIR
+  break
 else
   # The user wants to specify their own exports directory
   while true; do
@@ -137,7 +138,7 @@ else
         # Create the directory and init config file with
         # that directory for exports:
         mkdir $user_specified_exports_location
-        init_config_file $user_specified_exports_location
+        init_general_config_file $user_specified_exports_location
         break
       else
         echo "Please try again."
