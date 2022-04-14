@@ -1,9 +1,9 @@
 require "http"
 
-module Geocode
-  API_URL = "https://nominatim.openstreetmap.org/search?"
-  FORMAT = "format=json"
+API_URL = "https://nominatim.openstreetmap.org/search?"
+FORMAT = "format=json"
 
+module Geocode
   def Geocode.search_places_by_name(name)
     q = "q=#{name}"
     response = nil
