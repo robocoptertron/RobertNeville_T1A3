@@ -4,11 +4,11 @@ require_relative "./lib/timezone"
 require_relative "./lib/weather"
 
 class App
-  LOCAL = :local
-  ELSEWHERE = :elsewhere
-  CURRENT = :current
-  YESTERDAY = :yesterday
-  PAST_WEEK = :past_week
+  LOCAL = "Local"
+  ELSEWHERE = "Elsewhere"
+  CURRENT = "Current"
+  YESTERDAY = "Yesterday"
+  PAST_WEEK = "Past week"
 
   def initialize(config_manager)
     @config_manager = config_manager
@@ -91,7 +91,7 @@ class App
           next
         end
 
-        weather_type = self.select_weather_type
+        weather_type = self.select_forecast_type
 
         weather_info = self.get_current_weather(timezone, location_info)
 
@@ -126,7 +126,7 @@ class App
   end
 
   def select_location_type
-    message = "Please select a weather forecast type:"
+    message = "Please select a location type:"
     location_type_options = [LOCAL, ELSEWHERE]
     choice_index = Console.select(message, location_type_options)
     puts
@@ -138,7 +138,7 @@ class App
     options = []
     self.user_locations.each { |location| options.push(location["display_name"])}
     options.push("Somewhere else")
-    message = "Here are some of your recent locations!\nSelect 'Somewhere else' to enter a new location:"
+    message = "Please select from the following saved locations or 'Somewhere else' to enter a new one:"
     choice_index = Console.select(message, options)
     puts
     return if choice_index == options.length - 1
@@ -150,7 +150,6 @@ class App
   end
 
   def in_user_locations(location_info)
-    puts self.user_locations.include?(location_info)
     self.user_locations.include?(location_info)
   end
 
@@ -221,7 +220,6 @@ class App
   end
 
   def in_favourites(location_info)
-    puts self.favourites.include?(location_info)
     self.favourites.include?(location_info)
   end
 
@@ -234,8 +232,12 @@ class App
     end
   end
 
-  def select_weather_type
-    
+  def select_forecast_type
+    message = "Please select a weather forecast type:"
+    forecast_type_options = [CURRENT, YESTERDAY, PAST_WEEK]
+    choice_index = Console.select(message, forecast_type_options)
+    puts
+    forecast_type_options[choice_index]
   end
 
   def get_current_weather(timezone, location_info)
