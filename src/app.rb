@@ -129,19 +129,18 @@ class App
   end
 
   def select_location_from_user_locations
-    user_locations = self.load_user_locations
-    return if user_locations.length == 0
+    return if self.user_locations.length == 0
     options = []
-    user_locations.each { |location| options.push(location["display_name"])}
+    self.user_locations.each { |location| options.push(location["display_name"])}
     options.push("Somewhere else")
     message = "Here are some of your recent locations!\nSelect 'Somewhere else' to enter a new location:"
     choice_index = Console.select(message, options)
     puts
     return if choice_index == options.length - 1
-    user_locations[choice_index]
+    self.user_locations[choice_index]
   end
 
-  def load_user_locations
+  def user_locations
     @config_manager.user_locations["locations"]
   end
 
@@ -191,12 +190,11 @@ class App
   end
 
   def select_location_from_favourites
-    favourites = self.load_favourites
-    return if favourites.length == 0
+    return if self.favourites.length == 0
     select_from_favourites = Console.ask("Would you like to choose a location from your favourites?")
     return if !select_from_favourites
     options = []
-    favourites.each { |place| options.push(place["display_name"]) }
+    self.favourites.each { |place| options.push(place["display_name"]) }
     options.push("Search for new location")
     message = "Here are your favourite locations. Please make a selection:"
     choice_index = Console.select(message, options)
@@ -205,10 +203,10 @@ class App
       # Return nil:
       return
     end
-    favourites[choice_index]
+    self.favourites[choice_index]
   end
 
-  def load_favourites
+  def favourites
     @config_manager.favourites["favourites"]
   end
 
