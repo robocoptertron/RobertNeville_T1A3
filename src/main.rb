@@ -42,14 +42,14 @@ end
 
 options = results[:options]
 
-if options.length > 0
+if options.length > 1
   # This application does not support
   # multiple options in the one command. 
   # Display errors and exit:
-  puts "Please provide ONLY ONE option.".red
-  puts "Use the '--help' or '-h' option for help :)".green
+  puts "Please provide CLIMate with ONLY ONE option.".red
+  puts "You can use the '--help' or '-h' option for help :)".green
   exit
 end
 
 app = App.new(config_manager)
-app.exec(options)
+app.exec(options[0])

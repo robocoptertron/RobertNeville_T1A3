@@ -54,45 +54,7 @@ class ConfigManager
     end
   end
 
-  def exists?(file_path)
-    File.exist?(file_path)
-  end
-
-  def directory?(file_path)
-    File.directory?(file_path)
-  end
-
-  def validate_files
-    errors = []
-    CONFIG_FILES.each do |file_path|
-      if !self.exists?(file_path)
-        message = "CONFIG ERROR: #{file_path}: file missing"
-        errors.push(message)
-      elsif self.directory?(file_path)
-        message = "CONFIG ERROR: #{file_path}: file expected, directory found"
-        errors.push(message)
-      end
-    end
-    errors
-  end
-
-  def parse_json(json)
-    begin
-      JSON.parse(json)
-    rescue JSON::ParserError
-      nil
-    end
-  end
-
-  def load_config(file_path)
-    begin 
-      file = File.open(file_path)
-      contents = file.read
-      self.parse_json(contents)
-    rescue
-      nil
-    end
-  end
+  # Getters:
 
   def general_config
     @general_config
@@ -108,5 +70,74 @@ class ConfigManager
 
   def history
     @history
+  end
+
+  # Update methods:
+
+  def add_user_location(location_info)
+    @user_locations["locations"].push(location_info)
+    @user_locations["locations"].sort_by { |location| location[:display_name] }
+    error = self.save_user_locations
+    if error then puts error.red end
+  end
+
+  private
+
+  # Save methods:
+
+  def save_user_locations
+    begin
+      json = JSON.generate(@user_locations)
+      file = File.open(USER_LOCATIONS_FILE, "w")
+      file.write(json)
+      file.close
+    rescue => error
+      "There was a problem saving the location to #{USER_LOCATIONS_FILE}: #{error.message}"
+    end
+  end
+
+  # Initialisation methods:
+
+  def validate_files
+    errors = []
+    CONFIG_FILES.each do |file_path|
+      if !self.exists?(file_path)
+        message = "CONFIG ERROR: #{file_path}: file missing"
+        errors.push(message)
+      elsif self.directory?(file_path)
+        message = "CONFIG ERROR: #{file_path}: file expected, directory found"
+        errors.push(message)
+      end
+    end
+    errors
+  end
+
+  def load_config(file_path)
+    begin 
+      file = File.open(file_path)
+      contents = file.read
+      file.close
+      self.parse_json(contents)
+    rescue
+      nil
+    end
+  end
+
+  # Helper methods:
+
+  def parse_json(json)
+    begin
+      JSON.parse(json)
+    rescue JSON::ParserError
+      nil
+    end
+  end
+
+  def exists?(file_path)
+    File.exist?(file_path)
+  end
+
+  def directory?(file_path)
+    File.directory?(file_path)
   end
 end
