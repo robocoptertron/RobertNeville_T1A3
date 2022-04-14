@@ -1,6 +1,8 @@
 require "tty-prompt"
 require "colorize"
 require_relative "./lib/geocode"
+require_relative "./lib/timezone"
+require_relative "./lib/weather"
 
 LOCAL = "Local"
 ELSEWHERE = "Elsewhere"
@@ -41,6 +43,12 @@ class App
 
   def main_loop
     self.print_welcome_message
+    timezone = self.get_timezone
+    if !timezone
+      puts "CLIMate needs to know your timezone to fetch forecasts."
+      puts "Exiting..."
+      exit
+    end
     begin
       while true
         location_info = nil
@@ -58,7 +66,7 @@ class App
         when ELSEWHERE
 
         end
-        
+        puts Weather.fetch_current(timezone, location_info)
       end
     rescue SignalException
       self.exit_gracefully
@@ -66,6 +74,7 @@ class App
   end
 
   def print_welcome_message
+    puts
     puts "Welcome to CLIMate! You can use CTRL+C to exit at any time :)"
     puts
   end
@@ -136,6 +145,20 @@ class App
       end
     end
     puts
+  end
+
+  def get_timezone
+    puts "Determining your timezone..."
+    puts
+    response = Timezone.get()
+    if response[:error]
+      self.display_error(response[:error])
+      puts
+    else
+      puts "Your timezone was detected as #{response[:timezone]}.".green
+      puts
+      response[:timezone]
+    end
   end
 
   def exit_gracefully
