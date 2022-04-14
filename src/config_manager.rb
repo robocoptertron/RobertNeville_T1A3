@@ -76,7 +76,7 @@ class ConfigManager
 
   def add_user_location(location_info)
     @user_locations["locations"].push(location_info)
-    @user_locations["locations"].sort_by { |location| location[:display_name] }
+    @user_locations["locations"].sort_by! { |location| location["display_name"] }
     error = self.save_user_locations
     if error then puts error.red end
   end

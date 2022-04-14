@@ -59,14 +59,24 @@ class App
           if !location_info
             message = "Enter a place name for your current location:"
             location_info = self.get_location_info_from_user_input(message)
-            next if !location_info
-            save_location = self.ask("Would you like to save this location?")
-            if save_location then self.save_user_location(location_info) end
+            if location_info
+              save_location = self.ask("Would you like to save this location?")
+              if save_location then self.save_user_location(location_info) end
+            end
           end        
         when ELSEWHERE
 
         end
-        puts Weather.fetch_current(timezone, location_info)
+        
+        if !location_info
+          self.continue_or_exit?
+        end
+
+        weather_info = self.get_current_weather(timezone, location_info)
+
+        if weather_info
+          weather_info.each { |key, value| puts "#{key}: #{value}" }
+        end
       end
     rescue SignalException
       self.exit_gracefully
@@ -79,8 +89,27 @@ class App
     puts
   end
 
+  def get_timezone
+    puts "Determining your timezone..."
+    puts
+    response = Timezone.get()
+    if response["error"]
+      self.display_error(response["error"])
+      puts
+    else
+      puts "Your timezone was detected as #{response["timezone"]}.".green
+      puts
+      response["timezone"]
+    end
+  end
+
   def display_error(message)
     puts message.red
+  end
+
+  def continue_or_exit?
+    continue = self.ask("Would you like to continue using CLIMate?")
+    if !continue then self.exit_gracefully end
   end
 
   def get_forecast_type_from_user
@@ -116,10 +145,16 @@ class App
     places_found = self.place_name_search_loop(message)
     return if !places_found
     display_names = []
-    places_found.each { |place| display_names.push(place[:display_name]) }
+    places_found.each { |place| display_names.push(place["display_name"]) }
+    display_names.push("None of these")
     message = "Please choose the correct location from the following list of alternatives:"
     choice_index = self.select(message, display_names)
     puts
+    if choice_index == display_names.length - 1
+      # The user selected 'None of these'.
+      # Return nil:
+      return
+    end
     places_found[choice_index]
   end
 
@@ -130,11 +165,11 @@ class App
       puts "Searching for '#{place_name}' geocode info..."
       puts
       search_results = Geocode.search_places_by_name(place_name)
-      if search_results[:error]
-        self.display_error(search_results[:error])
+      if search_results["error"]
+        self.display_error(search_results["error"])
         break if !self.try_again?
       else
-        places_found = search_results[:places_found]
+        places_found = search_results["places_found"]
         if places_found.length == 0
           puts "Sorry - CLIMate couldn't find location info for '#{place_name}'"
           puts
@@ -147,18 +182,16 @@ class App
     puts
   end
 
-  def get_timezone
-    puts "Determining your timezone..."
+  def get_current_weather(timezone, location_info)
+    puts "Fetching weather data for '#{location_info["display_name"]}'..."
+    results = Weather.fetch_current(timezone, location_info["latitude"].to_f, location_info["longitude"].to_f)
     puts
-    response = Timezone.get()
-    if response[:error]
-      self.display_error(response[:error])
+    if results["error"]
+      self.display_error(results["error"])
       puts
-    else
-      puts "Your timezone was detected as #{response[:timezone]}.".green
-      puts
-      response[:timezone]
+      return
     end
+    results
   end
 
   def exit_gracefully

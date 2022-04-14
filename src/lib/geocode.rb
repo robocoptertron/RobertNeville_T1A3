@@ -11,21 +11,21 @@ module Geocode
       response = HTTP.get("#{API_URL}#{q}&#{FORMAT}")
     rescue HTTP::ConnectionError
       message = "Oops - there was a connection error. Make sure you're connected to the internet."
-      {error: message}
+      {"error" => message}
     else
       if response.status.server_error?
-        {error: "Oops - there was a server error. You might have to try again later."}
+        {"error" => "Oops - there was a server error. You might have to try again later."}
       end
       data = response.parse
       places_found = []
       data.each do |place_found|
         places_found.push({
-          display_name: place_found["display_name"],
-          latitude: place_found["lat"],
-          longitude: place_found["lon"]
+          "display_name" => place_found["display_name"],
+          "latitude" => place_found["lat"],
+          "longitude" => place_found["lon"]
         })
       end
-      {places_found: places_found}
+      {"places_found" => places_found}
     end
   end
 end
