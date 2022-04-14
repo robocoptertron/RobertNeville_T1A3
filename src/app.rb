@@ -52,8 +52,8 @@ class App
     begin
       while true
         location_info = nil
-        forecast_type = self.get_forecast_type_from_user
-        case forecast_type
+        location_type = self.get_location_type_from_user
+        case location_type
         when LOCAL
           location_info = self.get_location_info_from_user_locations
           if !location_info
@@ -65,11 +65,13 @@ class App
             end
           end        
         when ELSEWHERE
-
+          
         end
         
         if !location_info
-          self.continue_or_exit?
+          continue = self.continue_or_exit?
+          next if continue
+          self.exit_gracefully
         end
 
         weather_info = self.get_current_weather(timezone, location_info)
@@ -108,16 +110,15 @@ class App
   end
 
   def continue_or_exit?
-    continue = self.ask("Would you like to continue using CLIMate?")
-    if !continue then self.exit_gracefully end
+    self.ask("Would you like to continue using CLIMate?")
   end
 
-  def get_forecast_type_from_user
+  def get_location_type_from_user
     message = "Please select a weather forecast type:"
-    forecast_type_options = [LOCAL, ELSEWHERE]
-    choice_index = self.select(message, forecast_type_options)
+    location_type_options = [LOCAL, ELSEWHERE]
+    choice_index = self.select(message, location_type_options)
     puts
-    forecast_type_options[choice_index]
+    location_type_options[choice_index]
   end
 
   def get_location_info_from_user_locations
