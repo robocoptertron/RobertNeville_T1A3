@@ -51,14 +51,14 @@ class App
     begin
       while true
         location_info = nil
-        location_type = self.get_location_type_from_user
+        location_type = self.select_location_type
         case location_type
         when LOCAL
           location_info = self.select_location_from_user_locations
           if !location_info
             # The user elected to search for a new location:
             message = "Enter a place name for your current location:"
-            location_info = self.get_location_from_user_input(message)
+            location_info = self.get_location_from_user(message)
             if location_info
               save_location = self.ask("Would you like to save this location?")
               if save_location then self.save_user_location(location_info) end
@@ -69,7 +69,7 @@ class App
           if !location_info
             # The user elected to search for a new location:
             message = "Enter a place name to search for:"
-            location_info = self.get_location_from_user_input(message)
+            location_info = self.get_location_from_user(message)
             if location_info
               save_location = self.ask("Would you like to save this location?")
               if save_location then self.save_favourite(location_info) end
@@ -130,7 +130,7 @@ class App
     self.ask("Would you like to continue using CLIMate?")
   end
 
-  def get_location_type_from_user
+  def select_location_type
     message = "Please select a weather forecast type:"
     location_type_options = [LOCAL, ELSEWHERE]
     choice_index = self.select(message, location_type_options)
@@ -164,7 +164,7 @@ class App
     end
   end
 
-  def get_location_from_user_input(message)
+  def get_location_from_user(message)
     places_found = self.place_name_search_loop(message)
     return if !places_found
     options = []
