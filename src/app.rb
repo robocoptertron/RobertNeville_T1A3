@@ -94,7 +94,7 @@ class App
           weather_info.each { |key, value| puts "#{key}: #{value}" }
         end
 
-        if !Console.ask("Would you like to view the weather for another location?")
+        if !Console.yes?("Would you like to view the weather for another location?")
           self.exit_gracefully
         end
       end
