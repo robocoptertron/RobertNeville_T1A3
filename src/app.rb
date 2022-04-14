@@ -54,6 +54,7 @@ class App
       while true
         location_info = nil
         location_type = self.select_location_type
+
         case location_type
         when LOCAL
           location_info = self.select_location_from_user_locations
@@ -61,9 +62,11 @@ class App
             # The user elected to search for a new location:
             message = "Enter a place name for your current location:"
             location_info = self.get_location_from_user(message)
-            if location_info
-              save_location = Console.ask("Would you like to save this location?")
-              if save_location then self.save_user_location(location_info) end
+            if location_info && !self.in_user_locations(location_info)
+              save_location = Console.yes?("Would you like to save this location?")
+              if save_location
+                self.save_user_location(location_info) 
+              end
             end
           end        
         when ELSEWHERE
@@ -72,9 +75,11 @@ class App
             # The user elected to search for a new location:
             message = "Enter a place name to search for:"
             location_info = self.get_location_from_user(message)
-            if location_info
-              save_location = Console.ask("Would you like to save this location?")
-              if save_location then self.save_favourite(location_info) end
+            if location_info && !self.in_favourites(location_info)
+              save_location = Console.yes?("Would you like to save this location?")
+              if save_location
+                self.save_favourite(location_info) 
+              end
             end
           end
         end
@@ -144,6 +149,11 @@ class App
     @config_manager.user_locations["locations"]
   end
 
+  def in_user_locations(location_info)
+    puts self.user_locations.include?(location_info)
+    self.user_locations.include?(location_info)
+  end
+
   def save_user_location(location_info)
     error = @config_manager.add_user_location(location_info)
     if error
@@ -210,6 +220,11 @@ class App
     @config_manager.favourites["favourites"]
   end
 
+  def in_favourites(location_info)
+    puts self.favourites.include?(location_info)
+    self.favourites.include?(location_info)
+  end
+
   def save_favourite(location_info)
     error = @config_manager.add_favourite(location_info)
     if error
@@ -234,8 +249,8 @@ class App
   end
 
   def exit_gracefully
-    puts
     puts "Thanks for using CLIMate!"
+    puts
     puts "Exiting..."
     exit
   end

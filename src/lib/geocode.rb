@@ -20,6 +20,7 @@ module Geocode
       places_found = []
       data.each do |place_found|
         places_found.push({
+          "osm_id" => place_found["osm_id"],
           "display_name" => place_found["display_name"],
           "latitude" => place_found["lat"],
           "longitude" => place_found["lon"]
