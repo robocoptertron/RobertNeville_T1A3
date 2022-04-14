@@ -77,22 +77,33 @@ class ConfigManager
   def add_user_location(location_info)
     @user_locations["locations"].push(location_info)
     @user_locations["locations"].sort_by! { |location| location["display_name"] }
-    error = self.save_user_locations
-    if error then puts error.red end
+    error = self.save_config_file(USER_LOCATIONS_FILE, @user_locations)
+    if error 
+      error
+    end
+  end
+
+  def add_favourite(location_info)
+    @favourites["favourites"].push(location_info)
+    @favourites["favourites"].sort_by! { |location| location["display_name"] }
+    error = self.save_config_file(FAVOURITES_FILE, @favourites)
+    if error
+      error
+    end
   end
 
   private
 
   # Save methods:
 
-  def save_user_locations
+  def save_config_file(config_file_path, data_to_save)
     begin
-      json = JSON.generate(@user_locations)
-      file = File.open(USER_LOCATIONS_FILE, "w")
+      json = JSON.generate(data_to_save)
+      file = File.open(config_file_path, "w")
       file.write(json)
       file.close
     rescue => error
-      "There was a problem saving the location to #{USER_LOCATIONS_FILE}: #{error.message}"
+      "There was a problem saving the location to #{config_file_path}: #{error.message}"
     end
   end
 

@@ -45,9 +45,8 @@ class App
     self.print_welcome_message
     timezone = self.get_timezone
     if !timezone
-      puts "CLIMate needs to know your timezone to fetch forecasts."
-      puts "Exiting..."
-      exit
+      self.display_info("CLIMate needs to know your timezone to fetch forecasts.")
+      self.exit_gracefully
     end
     begin
       while true
@@ -55,17 +54,27 @@ class App
         location_type = self.get_location_type_from_user
         case location_type
         when LOCAL
-          location_info = self.get_location_info_from_user_locations
+          location_info = self.select_location_from_user_locations
           if !location_info
+            # The user elected to search for a new location:
             message = "Enter a place name for your current location:"
-            location_info = self.get_location_info_from_user_input(message)
+            location_info = self.get_location_from_user_input(message)
             if location_info
               save_location = self.ask("Would you like to save this location?")
               if save_location then self.save_user_location(location_info) end
             end
           end        
         when ELSEWHERE
-          
+          location_info = self.select_location_from_favourites
+          if !location_info
+            # The user elected to search for a new location:
+            message = "Enter a place name to search for:"
+            location_info = self.get_location_from_user_input(message)
+            if location_info
+              save_location = self.ask("Would you like to save this location?")
+              if save_location then self.save_favourite(location_info) end
+            end
+          end
         end
         
         if !location_info
@@ -92,21 +101,29 @@ class App
   end
 
   def get_timezone
-    puts "Determining your timezone..."
-    puts
+    self.display_info("Determining your timezone...")
     response = Timezone.get()
     if response["error"]
       self.display_error(response["error"])
-      puts
     else
-      puts "Your timezone was detected as #{response["timezone"]}.".green
-      puts
+      self.display_success("Your timezone was detected as #{response["timezone"]}.")
       response["timezone"]
     end
   end
 
+  def display_info(message)
+    puts message
+    puts
+  end
+
   def display_error(message)
     puts message.red
+    puts
+  end
+
+  def display_success(message)
+    puts message.green
+    puts
   end
 
   def continue_or_exit?
@@ -121,7 +138,7 @@ class App
     location_type_options[choice_index]
   end
 
-  def get_location_info_from_user_locations
+  def select_location_from_user_locations
     user_locations = self.load_user_locations
     return if user_locations.length == 0
     options = []
@@ -139,19 +156,23 @@ class App
   end
 
   def save_user_location(location_info)
-    @config_manager.add_user_location(location_info)
+    error = @config_manager.add_user_location(location_info)
+    if error
+      self.display_error(error)
+    else
+      self.display_success("Successfully added #{location_info["display_name"]} to user locations!")
+    end
   end
 
-  def get_location_info_from_user_input(message)
+  def get_location_from_user_input(message)
     places_found = self.place_name_search_loop(message)
     return if !places_found
-    display_names = []
-    places_found.each { |place| display_names.push(place["display_name"]) }
-    display_names.push("None of these")
+    options = []
+    places_found.each { |place| options.push(place["display_name"]) }
+    options.push("None of these")
     message = "Please choose the correct location from the following list of alternatives:"
-    choice_index = self.select(message, display_names)
-    puts
-    if choice_index == display_names.length - 1
+    choice_index = self.select(message, options)
+    if choice_index == options.length - 1
       # The user selected 'None of these'.
       # Return nil:
       return
@@ -162,9 +183,7 @@ class App
   def place_name_search_loop(message)
     while true
       place_name = self.ask(message)
-      puts
-      puts "Searching for '#{place_name}' geocode info..."
-      puts
+      self.display_info("Searching for '#{place_name}' geocode info...")
       search_results = Geocode.search_places_by_name(place_name)
       if search_results["error"]
         self.display_error(search_results["error"])
@@ -172,24 +191,51 @@ class App
       else
         places_found = search_results["places_found"]
         if places_found.length == 0
-          puts "Sorry - CLIMate couldn't find location info for '#{place_name}'"
-          puts
+          self.display_info("Sorry - CLIMate couldn't find location info for '#{place_name}'.")
           break if !self.try_again?
         else
           return places_found
         end
       end
     end
-    puts
+  end
+
+  def select_location_from_favourites
+    favourites = self.load_favourites
+    return if favourites.length == 0
+    select_from_favourites = self.ask("Would you like to choose a location from your favourites?")
+    return if !select_from_favourites
+    options = []
+    favourites.each { |place| options.push(place["display_name"]) }
+    options.push("Search for new location")
+    message = "Here are your favourite locations. Please make a selection:"
+    choice_index = self.select(message, options)
+    if choice_index == options.length - 1
+      # The user selected 'Search for new location'.
+      # Return nil:
+      return
+    end
+    favourites[choice_index]
+  end
+
+  def load_favourites
+    @config_manager.favourites["favourites"]
+  end
+
+  def save_favourite(location_info)
+    error = @config_manager.add_favourite(location_info)
+    if error
+      self.display_error(error)
+    else
+      self.display_success("Successfully added #{location_info["display_name"]} to favourites!")
+    end
   end
 
   def get_current_weather(timezone, location_info)
-    puts "Fetching weather data for '#{location_info["display_name"]}'..."
+    self.display_info("Fetching weather data for '#{location_info["display_name"]}'...")
     results = Weather.fetch_current(timezone, location_info["latitude"].to_f, location_info["longitude"].to_f)
-    puts
     if results["error"]
       self.display_error(results["error"])
-      puts
       return
     end
     results
@@ -206,7 +252,9 @@ class App
 
   def ask(message)
     prompt = TTY::Prompt.new
-    prompt.ask(message)
+    answer = prompt.ask(message)
+    puts
+    answer
   end
 
   def select(message, options)
@@ -214,6 +262,7 @@ class App
     choice = prompt.select(message, options)
     options.each_with_index do |option, index|
       if option == choice
+        puts
         return index
       end
     end
@@ -221,6 +270,8 @@ class App
 
   def try_again?
     prompt = TTY::Prompt.new
-    prompt.yes?("Try again?")
+    answer = prompt.yes?("Try again?")
+    puts
+    answer
   end
 end
