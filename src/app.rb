@@ -260,12 +260,13 @@ class App
 
   def print_current_weather(place_name, weather_info)
     Console.info("Current weather summary for #{place_name}:")
-    date_time = Date.parse(weather_info["time"])
-    puts "DATE                -> #{date_time}"
-    puts "CONDITIONS          -> #{weather_info["weather"]}"
-    puts "TEMPERATURE         -> #{weather_info["temp"]}"
-    puts "WIND SPEED          -> #{weather_info["wind_speed"]}"
-    puts "WIND DIRECTION      -> #{weather_info["wind_direction"]}"
+    date_time = weather_info["time"].split("T")
+    puts "DATE                -> #{date_time[0]}"
+    puts "HOUR                -> #{date_time[1]}"
+    puts "CONDITIONS          -> #{weather_info["weather"].capitalize}"
+    puts "TEMPERATURE         -> #{weather_info["temp"]} degrees Celcius"
+    puts "WIND SPEED          -> #{weather_info["wind_speed"]} km/h"
+    puts "WIND DIRECTION      -> #{weather_info["wind_direction"].capitalize}"
     puts
   end
 
