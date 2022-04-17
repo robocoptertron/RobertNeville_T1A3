@@ -52,15 +52,21 @@ module Weather
       if response.status.server_error?
         {"error" => "Oops - there was a server error. You might have to try again later."}
       end
-      data = response.parse
-      current_weather = data["current_weather"]
-      {
-        "time" => current_weather["time"], 
-        "temp" => current_weather["temperature"], 
-        "wind_speed" => current_weather["windspeed"],
-        "wind_direction" => self.translate_wind_direction(current_weather["winddirection"]),
-        "weather" => self.translate_weather_code(current_weather["weathercode"])
-      }
+      data = nil
+      begin
+        data = response.parse
+      rescue => e
+        {"error" => "There was a problem parsing the data returned by the API: #{e.message}"}
+      else
+        current_weather = data["current_weather"]
+        {
+          "time" => current_weather["time"], 
+          "temp" => current_weather["temperature"], 
+          "wind_speed" => current_weather["windspeed"],
+          "wind_direction" => self.translate_wind_direction(current_weather["winddirection"]),
+          "weather" => self.translate_weather_code(current_weather["weathercode"])
+        }
+      end
     end
   end
 
@@ -79,11 +85,17 @@ module Weather
       if response.status.server_error?
         {"error" => "Oops - there was a server error. You might have to try again later."}
       end
-      data = response.parse
-      {
-        "daily_units" => data["daily_units"],
-        "daily_variables" => data["daily"]
-      }
+      data = nil
+      begin
+        data = response.parse
+      rescue => e
+        {"error" => "There was a problem parsing the data returned by the API: #{e.message}"}
+      else
+        {
+          "daily_units" => data["daily_units"],
+          "daily_variables" => data["daily"]
+        }
+      end
     end
   end
 
