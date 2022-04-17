@@ -7,8 +7,7 @@ class App
   LOCAL = "Local"
   ELSEWHERE = "Elsewhere"
   CURRENT = "Current"
-  YESTERDAY = "Yesterday"
-  PAST_WEEK = "Past week"
+  COMING_WEEK = "Coming week"
 
   def initialize(config_manager)
     @config_manager = config_manager
@@ -91,12 +90,19 @@ class App
           next
         end
 
-        weather_type = self.select_forecast_type
+        forecast_type = self.select_forecast_type
 
-        weather_info = self.get_current_weather(timezone, location_info)
-
-        if weather_info
-          weather_info.each { |key, value| puts "#{key}: #{value}" }
+        case forecast_type
+        when CURRENT
+          weather_info = self.get_current_weather(timezone, location_info)
+          if !weather_info
+            message = "Sorry - CLIMate couldn't get weather data for #{location_info["display_name"]}"
+            Console.info(message)
+          else
+            self.print_current_weather(location_info["display_name"], weather_info)
+          end
+        when COMING_WEEK
+          puts "Coming week"
         end
 
         if !Console.yes?("Would you like to view the weather for another location?")
@@ -129,7 +135,6 @@ class App
     message = "Please select a location type:"
     location_type_options = [LOCAL, ELSEWHERE]
     choice_index = Console.select(message, location_type_options)
-    puts
     location_type_options[choice_index]
   end
 
@@ -138,9 +143,8 @@ class App
     options = []
     self.user_locations.each { |location| options.push(location["display_name"])}
     options.push("Somewhere else")
-    message = "Please select from the following saved locations or 'Somewhere else' to enter a new one:"
+    message = "Please select one of the following saved locations or 'Somewhere else' to enter a new one:"
     choice_index = Console.select(message, options)
-    puts
     return if choice_index == options.length - 1
     self.user_locations[choice_index]
   end
@@ -200,7 +204,8 @@ class App
 
   def select_location_from_favourites
     return if self.favourites.length == 0
-    select_from_favourites = Console.ask("Would you like to choose a location from your favourites?")
+    message = "Would you like to choose a location from your favourites?"
+    select_from_favourites = Console.ask(message)
     return if !select_from_favourites
     options = []
     self.favourites.each { |place| options.push(place["display_name"]) }
@@ -234,15 +239,18 @@ class App
 
   def select_forecast_type
     message = "Please select a weather forecast type:"
-    forecast_type_options = [CURRENT, YESTERDAY, PAST_WEEK]
+    forecast_type_options = [CURRENT, COMING_WEEK]
     choice_index = Console.select(message, forecast_type_options)
-    puts
     forecast_type_options[choice_index]
   end
 
   def get_current_weather(timezone, location_info)
-    Console.info("Fetching weather data for '#{location_info["display_name"]}'...")
-    results = Weather.fetch_current(timezone, location_info["latitude"].to_f, location_info["longitude"].to_f)
+    Console.info("Fetching current weather data for #{location_info["display_name"]}...")
+    results = Weather.fetch_current(
+      timezone, 
+      location_info["latitude"].to_f, 
+      location_info["longitude"].to_f
+    )
     if results["error"]
       Console.error(results["error"])
       return
@@ -250,10 +258,34 @@ class App
     results
   end
 
-  def exit_gracefully
-    puts "Thanks for using CLIMate!"
+  def print_current_weather(place_name, weather_info)
+    Console.info("Current weather summary for #{place_name}:")
+    date_time = Date.parse(weather_info["time"])
+    puts "DATE                -> #{date_time}"
+    puts "CONDITIONS          -> #{weather_info["weather"]}"
+    puts "TEMPERATURE         -> #{weather_info["temp"]}"
+    puts "WIND SPEED          -> #{weather_info["wind_speed"]}"
+    puts "WIND DIRECTION      -> #{weather_info["wind_direction"]}"
     puts
-    puts "Exiting..."
+  end
+
+  def get_coming_week_weather(timezone, location_info)
+    Console.info("Fetching the coming week's weather data for #{location_info["display_name"]}...")
+    results = Weather.fetch_coming_week(
+      timezone, 
+      location_info["latitude"].to_f, 
+      location_info["longitude"].to_f
+    )
+    if results["error"]
+      Console.lerror(results["error"])
+      return
+    end
+    results
+  end
+
+  def exit_gracefully
+    Console.info("Thanks for using CLIMate!")
+    Console.info("Exiting")
     exit
   end
 end
