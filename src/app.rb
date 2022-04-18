@@ -82,6 +82,12 @@ class App
     puts args
   end
 
+  def exit_gracefully
+    Console.info("Thanks for using CLIMate!")
+    Console.info("Exiting")
+    exit
+  end
+
   def main_loop
     self.print_welcome_message
     timezone = self.get_timezone
@@ -531,11 +537,5 @@ class App
     else
       Console.success("Successfully added the weather data to your history!")
     end
-  end
-
-  def exit_gracefully
-    Console.info("Thanks for using CLIMate!")
-    Console.info("Exiting")
-    exit
   end
 end
