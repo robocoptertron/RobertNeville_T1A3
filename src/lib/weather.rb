@@ -91,12 +91,24 @@ module Weather
       rescue => e
         {"error" => "There was a problem parsing the data returned by the API: #{e.message}"}
       else
-        {
-          "daily_units" => data["daily_units"],
-          "daily_variables" => data["daily"]
-        }
+        {"coming_week_weather" => Weather.process_coming_week_weather(data["daily"], data["daily_units"])}
       end
     end
+  end
+
+  def Weather.process_coming_week_weather(daily_variables, daily_units)
+    coming_week_weather = []
+    for day in 0..6 do
+      weather_info = {}
+      daily_variables.each do |key, value|
+        weather_info[key] = {
+          "value" => value[day],
+          "unit" => daily_units[key]
+        }
+      end
+      coming_week_weather.push(weather_info)
+    end
+    coming_week_weather
   end
 
   def Weather.translate_wind_direction(wind_direction_degrees)

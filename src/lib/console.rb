@@ -42,6 +42,12 @@ module Console
     end
   end
 
+  def Console.get_weather_field_string(label_value)
+    weather_field_string = label
+    weather_field_string += ("-" * (30 - label.length) + "> ")
+    weather_field_string = value
+  end
+  
   def Console.print_weather_field(label, value)
     print label.yellow
     print ("-" * (30 - label.length) + "> ").blue

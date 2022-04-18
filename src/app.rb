@@ -1,3 +1,5 @@
+require "prawn"
+
 require_relative "./lib/console"
 require_relative "./lib/geocode"
 require_relative "./lib/timezone"
@@ -105,8 +107,8 @@ class App
             self.print_current_weather(location_info["display_name"], weather_info)
           end
         when COMING_WEEK
-          weather_info = self.get_coming_week_weather(timezone, location_info)
-          if !weather_info
+          weekly_forecast = self.get_coming_week_weather(timezone, location_info)
+          if !weekly_forecast
             message = "Sorry - CLIMate couldn't get weather data for #{location_info["display_name"]}"
             Console.info(message)
           else
@@ -114,9 +116,9 @@ class App
             output_type = self.select_output_type
             case output_type
             when PRINT_TO_CONSOLE
-              self.print_coming_week_weather(location_info["display_name"], weather_info)
+              self.print_coming_week_weather(location_info["display_name"], weekly_forecast)
             when EXPORT_TO_PDF
-
+              self.generate_forecast_pdf(location_info["display_name"], weekly_forecast)
             end
           end
         end
@@ -294,10 +296,10 @@ class App
       location_info["longitude"].to_f
     )
     if results["error"]
-      Console.lerror(results["error"])
+      Console.error(results["error"])
       return
     end
-    results
+    results["coming_week_weather"]
   end
 
   def select_output_type
@@ -307,40 +309,94 @@ class App
     output_type_options[choice_index]
   end
 
-  def print_coming_week_weather(place_name, weather_info)
+  def print_coming_week_weather(place_name, weather_data)
     Console.info("Coming week's weather for #{place_name}:")
-    # Destructure weather info:
-    daily_variables = weather_info["daily_variables"]
-    daily_units = weather_info["daily_units"]
-    times = daily_variables["time"]
-    min_temperatures = daily_variables["temperature_2m_min"]
-    max_temperatures = daily_variables["temperature_2m_max"]
-    apparent_temperatures_min = daily_variables["apparent_temperature_min"]
-    apparent_temperatures_max = daily_variables["apparent_temperature_max"]
-    precipitation_sums = daily_variables["precipitation_sum"]
-    precipitation_hours = daily_variables["precipitation_hours"]
-    weathercodes = daily_variables["weathercode"]
-    sunrises = daily_variables["sunrise"]
-    sunsets = daily_variables["sunset"]
-    windspeeds_max = daily_variables["windspeed_10m_max"]
-    wind_directions_dominant = daily_variables["winddirection_10m_dominant"]
-    shortwave_radiation_sums = daily_variables["shortwave_radiation_sum"]
-
-    for day in 0..6 do
+    weather_data.each do |daily_forecast|
+      Console.print_weather_field(
+        "Date", 
+        daily_forecast["time"]["value"]
+      )
+      Console.print_weather_field(
+        "Min Temperature", 
+        self.weather_variable_to_s(daily_forecast["temperature_2m_min"])
+      )
+      Console.print_weather_field(
+        "Max Temperature", 
+        self.weather_variable_to_s(daily_forecast["temperature_2m_max"])
+      )
+      Console.print_weather_field(
+        "Min Apparent Temperature", 
+        self.weather_variable_to_s(daily_forecast["apparent_temperature_min"])
+      )
+      Console.print_weather_field(
+        "Max Apparent Temperature", 
+        self.weather_variable_to_s(daily_forecast["apparent_temperature_max"])
+      )
+      Console.print_weather_field(
+        "Precipitation Sum", 
+        self.weather_variable_to_s(daily_forecast["precipitation_sum"])
+      )
+      Console.print_weather_field(
+        "Precipitation Hours", 
+        self.weather_variable_to_s(daily_forecast["precipitation_hours"])
+      )
+      Console.print_weather_field(
+        "Expected Conditions", 
+        Weather.translate_weather_code(daily_forecast["weathercode"]["value"])
+      )
+      Console.print_weather_field(
+        "Sunrise", 
+        daily_forecast["sunrise"]["value"].split("T")[1]
+      )
+      Console.print_weather_field(
+        "Sunset", 
+        daily_forecast["sunset"]["value"].split("T")[1]
+      )
+      Console.print_weather_field(
+        "Max Windspeed", 
+        self.weather_variable_to_s(daily_forecast["windspeed_10m_max"])
+      )
+      Console.print_weather_field(
+        "Dominant Wind Direction", 
+        Weather.translate_wind_direction(daily_forecast["winddirection_10m_dominant"]["value"])
+      )
+      Console.print_weather_field(
+        "Shortwave Radiation Sum", 
+        self.weather_variable_to_s(daily_forecast["shortwave_radiation_sum"])
+      )
       puts
-      Console.print_weather_field("Date", times[day])
-      Console.print_weather_field("Min Temperature", "#{min_temperatures[day]} #{daily_units["temperature_2m_min"]}")
-      Console.print_weather_field("Max Temperature", "#{max_temperatures[day]} #{daily_units["temperature_2m_max"]}")
-      Console.print_weather_field("Min Apparent Temperature", "#{apparent_temperatures_min[day]} #{daily_units["apparent_temperature_min"]}")
-      Console.print_weather_field("Max Apparent Temperature", "#{apparent_temperatures_max[day]} #{daily_units["apparent_temperature_max"]}")
-      Console.print_weather_field("Precipitation Sum", "#{precipitation_sums[day]} #{daily_units["precipitation_sum"]}")
-      Console.print_weather_field("Precipitation Hours", "#{precipitation_hours[day]} #{daily_units["precipitation_hours"]}")
-      Console.print_weather_field("Expected Conditions", "#{Weather.translate_weather_code(weathercodes[day])}")
-      Console.print_weather_field("Sunrise", "#{sunrises[day]}")
-      Console.print_weather_field("Sunset", "#{sunsets[day]}")
-      Console.print_weather_field("Max Windspeed", "#{windspeeds_max[day]} #{daily_units["windspeed_10m_max"]}")
-      Console.print_weather_field("Dominant Wind Direction", "#{Weather.translate_wind_direction(wind_directions_dominant[day])}")
-      Console.print_weather_field("Shortwave Radiation Sum", "#{shortwave_radiation_sums[day]} #{daily_units["shortwave_radiation_sum"]}")
+    end
+  end
+
+  def weather_variable_to_s(weather_variable)
+    "#{weather_variable["value"]} #{weather_variable["unit"]}"
+  end
+
+  def generate_forecast_pdf(place_name, weather_info)
+    filename = nil
+    while !filename
+      filename_input = Console.ask("Please enter a name for the file:")
+      if filename_input == "." || filename_input == ".."
+        Console.error("'.' and '..' are reserved filenames.")
+        next
+      end
+      add_pdf_extension = true
+      if filename_input.match(/\.pdf$/)
+        add_pdf_extension = false
+      end
+      filename = @config_manager.general_config["output"] + "/#{filename_input}" + (add_pdf_extension ? ".pdf" : "")
+    end
+    
+    proceed = true
+    if File.exist?(filename)
+      proceed = Console.yes?("'#{filename}' already exists. Do you want to overwrite it?")
+    end
+
+    if proceed
+      Prawn::Document.generate(filename) do
+      end
+    else
+      Console.info("Aborting PDF generation...")
     end
   end
 
