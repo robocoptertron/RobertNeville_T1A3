@@ -39,7 +39,7 @@ init_history_file() {
   echo "Creating $HISTORY_FILE..."
   touch $HISTORY_FILE
   cat > $HISTORY_FILE <<JSON
-{ "forecasts": [] }
+{ "history": [] }
 JSON
 }
 
