@@ -1,4 +1,3 @@
-require "colorize"
 require_relative "./lib/console"
 require_relative "./config_manager"
 require_relative "./parser/parser"
