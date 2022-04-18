@@ -99,8 +99,6 @@ module Weather
     end
   end
 
-  private
-
   def Weather.translate_wind_direction(wind_direction_degrees)
     compass_segment = (wind_direction_degrees / DEGREES_IN_COMPASS_SEGMENT).floor
     WIND_DIRECTIONS[compass_segment]

@@ -8,6 +8,8 @@ class App
   ELSEWHERE = "Elsewhere"
   CURRENT = "Current"
   COMING_WEEK = "Coming week"
+  PRINT_TO_CONSOLE = "Print to console"
+  EXPORT_TO_PDF = "Export to PDF"
 
   def initialize(config_manager)
     @config_manager = config_manager
@@ -99,10 +101,24 @@ class App
             message = "Sorry - CLIMate couldn't get weather data for #{location_info["display_name"]}"
             Console.info(message)
           else
+            Console.success("Success!")
             self.print_current_weather(location_info["display_name"], weather_info)
           end
         when COMING_WEEK
-          puts "Coming week"
+          weather_info = self.get_coming_week_weather(timezone, location_info)
+          if !weather_info
+            message = "Sorry - CLIMate couldn't get weather data for #{location_info["display_name"]}"
+            Console.info(message)
+          else
+            Console.success("Success!")
+            output_type = self.select_output_type
+            case output_type
+            when PRINT_TO_CONSOLE
+              self.print_coming_week_weather(location_info["display_name"], weather_info)
+            when EXPORT_TO_PDF
+
+            end
+          end
         end
 
         if !Console.yes?("Would you like to view the weather for another location?")
@@ -259,14 +275,14 @@ class App
   end
 
   def print_current_weather(place_name, weather_info)
-    Console.info("Current weather summary for #{place_name}:")
+    Console.info("Current weather for #{place_name}:")
     date_time = weather_info["time"].split("T")
-    puts "DATE                -> #{date_time[0]}"
-    puts "HOUR                -> #{date_time[1]}"
-    puts "CONDITIONS          -> #{weather_info["weather"].capitalize}"
-    puts "TEMPERATURE         -> #{weather_info["temp"]} degrees Celcius"
-    puts "WIND SPEED          -> #{weather_info["wind_speed"]} km/h"
-    puts "WIND DIRECTION      -> #{weather_info["wind_direction"].capitalize}"
+    Console.print_weather_field("Date", date_time[0])
+    Console.print_weather_field("Hour", date_time[1])
+    Console.print_weather_field("Prevailing Conditions", weather_info["weather"].capitalize)
+    Console.print_weather_field("Temperature", weather_info["temp"])
+    Console.print_weather_field("Wind Speed", "#{weather_info["wind_speed"]} km/h")
+    Console.print_weather_field("Wind Direction", weather_info["wind_direction"].capitalize)
     puts
   end
 
@@ -282,6 +298,49 @@ class App
       return
     end
     results
+  end
+
+  def select_output_type
+    message = "How would you like to view the results?"
+    output_type_options = [PRINT_TO_CONSOLE, EXPORT_TO_PDF]
+    choice_index = Console.select(message, output_type_options)
+    output_type_options[choice_index]
+  end
+
+  def print_coming_week_weather(place_name, weather_info)
+    Console.info("Coming week's weather for #{place_name}:")
+    daily_variables = weather_info["daily_variables"]
+    daily_units = weather_info["daily_units"]
+    times = daily_variables["time"]
+    min_temperatures = daily_variables["temperature_2m_min"]
+    max_temperatures = daily_variables["temperature_2m_max"]
+    apparent_temperatures_min = daily_variables["apparent_temperature_min"]
+    apparent_temperatures_max = daily_variables["apparent_temperature_max"]
+    precipitation_sums = daily_variables["precipitation_sum"]
+    precipitation_hours = daily_variables["precipitation_hours"]
+    weathercodes = daily_variables["weathercode"]
+    sunrises = daily_variables["sunrise"]
+    sunsets = daily_variables["sunset"]
+    windspeeds_max = daily_variables["windspeed_10m_max"]
+    wind_directions_dominant = daily_variables["winddirection_10m_dominant"]
+    shortwave_radiation_sums = daily_variables["shortwave_radiation_sum"]
+
+    for day in 0..6 do
+      puts
+      Console.print_weather_field("Date", times[day])
+      Console.print_weather_field("Min Temperature", "#{min_temperatures[day]} #{daily_units["temperature_2m_min"]}")
+      Console.print_weather_field("Max Temperature", "#{max_temperatures[day]} #{daily_units["temperature_2m_max"]}")
+      Console.print_weather_field("Min Apparent Temperature", "#{apparent_temperatures_min[day]} #{daily_units["apparent_temperature_min"]}")
+      Console.print_weather_field("Max Apparent Temperature", "#{apparent_temperatures_max[day]} #{daily_units["apparent_temperature_max"]}")
+      Console.print_weather_field("Precipitation Sum", "#{precipitation_sums[day]} #{daily_units["precipitation_sum"]}")
+      Console.print_weather_field("Precipitation Hours", "#{precipitation_hours[day]} #{daily_units["precipitation_hours"]}")
+      Console.print_weather_field("Expected Conditions", "#{Weather.translate_weather_code(weathercodes[day])}")
+      Console.print_weather_field("Sunrise", "#{sunrises[day]}")
+      Console.print_weather_field("Sunset", "#{sunsets[day]}")
+      Console.print_weather_field("Max Windspeed", "#{windspeeds_max[day]} #{daily_units["windspeed_10m_max"]}")
+      Console.print_weather_field("Dominant Wind Direction", "#{Weather.translate_wind_direction(wind_directions_dominant[day])}")
+      Console.print_weather_field("Shortwave Radiation Sum", "#{shortwave_radiation_sums[day]} #{daily_units["shortwave_radiation_sum"]}")
+    end
   end
 
   def exit_gracefully

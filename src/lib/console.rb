@@ -41,4 +41,11 @@ module Console
       end
     end
   end
+
+  def Console.print_weather_field(label, value)
+    print label.yellow
+    print ("-" * (30 - label.length) + "> ").blue
+    print value
+    puts
+  end
 end
