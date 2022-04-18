@@ -39,7 +39,43 @@ class App
   end
 
   def config(args)
-    puts args
+    case args.length
+    when 1
+      case args[0]
+      when "list"
+        self.print_config
+      else
+        Console.error("Invalid argument '#{args[0]}' for config option.")
+      end
+    when 3
+      case args[0]
+      when "set"
+        self.set_config_option(args[1], args[2])
+      else
+        Console.error("Invalid argument '#{args[0]} for config option.'")
+      end
+    end
+  end
+
+  def print_config
+    puts
+    Console.info("Current CLIMate configuration:")
+    @config_manager.general_config.each do |key, value|
+      print key.yellow
+      print ("-" * (30 - key.length) + "> ").blue
+      print value.to_s
+      puts
+      puts
+    end
+  end
+
+  def set_config_option(key, value)
+    error = @config_manager.set_config_option(key, value)
+    if error
+      Console.error(error)
+    else
+      Console.success("Successfully set '#{key}' to '#{value}'!")
+    end
   end
 
   def history(args)
@@ -55,8 +91,8 @@ class App
     end
     begin
       while true
-        location_info = nil
         location_type = self.select_location_type
+        location_info = nil
 
         case location_type
         when LOCAL
@@ -95,16 +131,18 @@ class App
         end
 
         forecast_type = self.select_forecast_type
+        current_weather = nil
+        weekly_forecast = nil
 
         case forecast_type
         when CURRENT
-          weather_info = self.get_current_weather(timezone, location_info)
-          if !weather_info
+          current_weather = self.get_current_weather(timezone, location_info)
+          if !current_weather
             message = "Sorry - CLIMate couldn't get weather data for #{location_info["display_name"]}"
             Console.info(message)
           else
             Console.success("Success!")
-            self.print_current_weather(location_info["display_name"], weather_info)
+            self.print_current_weather(location_info["display_name"], current_weather)
           end
         when COMING_WEEK
           weekly_forecast = self.get_coming_week_weather(timezone, location_info)
@@ -119,6 +157,16 @@ class App
               self.print_coming_week_weather(location_info["display_name"], weekly_forecast)
             when EXPORT_TO_PDF
               self.generate_forecast_pdf(location_info["display_name"], weekly_forecast)
+            end
+          end
+        end
+
+        if current_weather || weekly_forecast
+          if Console.yes?("Would you like to save this weather data to your history?")
+            if current_weather
+              self.save_to_history(location_info["display_name"], forecast_type, current_weather)
+            elsif weekly_forecast
+              self.save_to_history(location_info["display_name"], forecast_type, weekly_forecast)
             end
           end
         end
@@ -276,15 +324,15 @@ class App
     results
   end
 
-  def print_current_weather(place_name, weather_info)
+  def print_current_weather(place_name, current_weather)
     Console.info("Current weather for #{place_name}:")
-    date_time = weather_info["time"].split("T")
+    date_time = current_weather["time"].split("T")
     Console.print_weather_field("Date", date_time[0])
     Console.print_weather_field("Hour", date_time[1])
-    Console.print_weather_field("Prevailing Conditions", weather_info["weather"])
-    Console.print_weather_field("Temperature", weather_info["temp"])
-    Console.print_weather_field("Wind Speed", "#{weather_info["wind_speed"]} km/h")
-    Console.print_weather_field("Wind Direction", weather_info["wind_direction"])
+    Console.print_weather_field("Prevailing Conditions", current_weather["weather"])
+    Console.print_weather_field("Temperature", current_weather["temp"])
+    Console.print_weather_field("Wind Speed", "#{current_weather["wind_speed"]} km/h")
+    Console.print_weather_field("Wind Direction", current_weather["wind_direction"])
     puts
   end
 
@@ -466,6 +514,23 @@ class App
     weather_field_string = label
     weather_field_string += ("-" * (30 - label.length) + "> ")
     weather_field_string += value
+  end
+
+  def save_to_history(place_name, forecast_type, weather_data)
+    date_time = Time.new
+    history_entry = {
+      "date" => "#{date_time.year}-#{date_time.month}-#{date_time.day}",
+      "time" => "#{date_time.hour}:#{date_time.min}-#{date_time.sec}",
+      "location" => place_name,
+      "forecast_type" => forecast_type,
+      "weather_data" => weather_data
+    }
+    error = @config_manager.add_history_entry(history_entry)
+    if error
+      Console.error(error)
+    else
+      Console.success("Successfully added the weather data to your history!")
+    end
   end
 
   def exit_gracefully

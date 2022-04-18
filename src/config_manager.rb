@@ -1,4 +1,6 @@
+require "fileutils"
 require "json"
+require_relative "./lib/console"
 
 CONFIG_DIR = File.join(Dir.home, ".CLIMate")
 
@@ -74,6 +76,25 @@ class ConfigManager
 
   # Update methods:
 
+  def set_config_option(key, value)
+    puts
+    case key
+    when "output"
+      if File.exist?(value) && !File.directory?(value)
+        Console.error("#{value} is a file - not a directory.")
+      elsif !Dir.exist?(value)
+        proceed = Console.yes?("#{value} does not yet exist. Would you like to create it?")
+        if !proceed then return end
+        FileUtils.mkdir_p(value)
+      end
+      @general_config["output"] = value
+    end
+    error = self.save_config_file(GENERAL_CONFIG_FILE, @general_config)
+    if error
+      error
+    end
+  end
+
   def add_user_location(location_info)
     @user_locations["locations"].push(location_info)
     @user_locations["locations"].sort_by! { |location| location["display_name"] }
@@ -92,18 +113,27 @@ class ConfigManager
     end
   end
 
+  def add_history_entry(history_entry)
+    @history["history"].push(history_entry)
+    @history["history"].sort_by! { |history_entry| Date.parse(history_entry["date"])}
+    error = self.save_config_file(HISTORY_FILE, @history)
+    if error
+      error
+    end
+  end
+
   private
 
   # Save methods:
 
   def save_config_file(config_file_path, data_to_save)
     begin
-      json = JSON.generate(data_to_save)
+      json = JSON.pretty_generate(data_to_save)
       file = File.open(config_file_path, "w")
       file.write(json)
       file.close
     rescue => error
-      "There was a problem saving the location to #{config_file_path}: #{error.message}"
+      "There was a problem saving #{config_file_path}: #{error.message}"
     end
   end
 
