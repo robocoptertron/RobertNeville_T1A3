@@ -281,10 +281,10 @@ class App
     date_time = weather_info["time"].split("T")
     Console.print_weather_field("Date", date_time[0])
     Console.print_weather_field("Hour", date_time[1])
-    Console.print_weather_field("Prevailing Conditions", weather_info["weather"].capitalize)
+    Console.print_weather_field("Prevailing Conditions", weather_info["weather"])
     Console.print_weather_field("Temperature", weather_info["temp"])
     Console.print_weather_field("Wind Speed", "#{weather_info["wind_speed"]} km/h")
-    Console.print_weather_field("Wind Direction", weather_info["wind_direction"].capitalize)
+    Console.print_weather_field("Wind Direction", weather_info["wind_direction"])
     puts
   end
 
