@@ -11,8 +11,6 @@ gem "json", "~> 2.6"
 
 gem "tty-prompt", "~> 0.23.1"
 
-gem "tty-progressbar", "~> 0.18.2"
-
 gem "rspec", "~> 3.11"
 
 gem "colorize", "~> 0.8.1"
