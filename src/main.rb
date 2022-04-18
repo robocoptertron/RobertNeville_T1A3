@@ -1,4 +1,5 @@
 require "colorize"
+require_relative "./lib/console"
 require_relative "./config_manager"
 require_relative "./parser/parser"
 require_relative "./app"
@@ -7,11 +8,11 @@ config_manager = ConfigManager.new
 config_errors = config_manager.init
 
 if config_errors
-  puts "Oops! There were some configuration errors:"
+  Console.info("Oops! There were some configuration errors:")
   config_errors.each do |error_message|
-  puts error_message.red
+    Console.error(error_message)
   end
-  puts "Please run the setup script to sort things out!"
+  Console.info("Please run the setup script to sort things out!")
   exit
 end
 
@@ -20,10 +21,9 @@ results = parser.parse(ARGV)
 
 if results[:errors].length > 0
   # There were parsing errors, so display them and exit:
-  puts "Please fix the following command line argument errors:"
+  Console.info("Please fix the following command line argument errors:")
   results[:errors].each_with_index do |error, i|
-    print "#{i + 1}. "
-    puts error.red
+    Console.error("#{i + 1}. #{error}")
   end
   exit
 end
@@ -35,7 +35,7 @@ if arguments.length > 0
   # non-option arguments. Display errors
   # and exit:
   arguments.each do |arg|
-    puts "Unexpected token: '#{arg}'".red
+    Console.error("Unexpected token: '#{arg}'")
   end
   exit
 end
@@ -46,8 +46,8 @@ if options.length > 1
   # This application does not support
   # multiple options in the one command. 
   # Display errors and exit:
-  puts "Please provide CLIMate with ONLY ONE option.".red
-  puts "You can use the '--help' or '-h' option for help :)".green
+  Console.error("Please provide CLIMate with ONLY ONE option.")
+  Console.info("You can use the '--help' or '-h' option for help :)")
   exit
 end
 
