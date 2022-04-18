@@ -372,7 +372,7 @@ class App
     "#{weather_variable["value"]} #{weather_variable["unit"]}"
   end
 
-  def generate_forecast_pdf(place_name, weather_info)
+  def generate_forecast_pdf(place_name, weather_data)
     filename = nil
     while !filename
       filename_input = Console.ask("Please enter a name for the file:")
@@ -393,11 +393,79 @@ class App
     end
 
     if proceed
-      Prawn::Document.generate(filename) do
+      Prawn::Fonts::AFM.hide_m17n_warning = true
+      Prawn::Document.generate(filename) do |pdf|
+        pdf.text "Weekly Weather Forecast for #{place_name}"
+        pdf.text Time.now.inspect
+        pdf.stroke_horizontal_rule
+        pdf.move_down 20
+        pdf.font "Courier"
+        weather_data.each do |daily_forecast|
+          pdf.text self.get_weather_field_string(
+            "Date", 
+            daily_forecast["time"]["value"]
+          )
+          pdf.text self.get_weather_field_string(
+            "Min Temperature", 
+            self.weather_variable_to_s(daily_forecast["temperature_2m_min"])
+          )
+          pdf.text self.get_weather_field_string(
+            "Max Temperature", 
+            self.weather_variable_to_s(daily_forecast["temperature_2m_max"])
+          )
+          pdf.text self.get_weather_field_string(
+            "Min Apparent Temperature", 
+            self.weather_variable_to_s(daily_forecast["apparent_temperature_min"])
+          )
+          pdf.text self.get_weather_field_string(
+            "Max Apparent Temperature", 
+            self.weather_variable_to_s(daily_forecast["apparent_temperature_max"])
+          )
+          pdf.text self.get_weather_field_string(
+            "Precipitation Sum", 
+            self.weather_variable_to_s(daily_forecast["precipitation_sum"])
+          )
+          pdf.text self.get_weather_field_string(
+            "Precipitation Hours", 
+            self.weather_variable_to_s(daily_forecast["precipitation_hours"])
+          )
+          pdf.text self.get_weather_field_string(
+            "Expected Conditions", 
+            Weather.translate_weather_code(daily_forecast["weathercode"]["value"])
+          )
+          pdf.text self.get_weather_field_string(
+            "Sunrise", 
+            daily_forecast["sunrise"]["value"].split("T")[1]
+          )
+          pdf.text self.get_weather_field_string(
+            "Sunset", 
+            daily_forecast["sunset"]["value"].split("T")[1]
+          )
+          pdf.text self.get_weather_field_string(
+            "Max Windspeed", 
+            self.weather_variable_to_s(daily_forecast["windspeed_10m_max"])
+          )
+          pdf.text self.get_weather_field_string(
+            "Dominant Wind Direction", 
+            Weather.translate_wind_direction(daily_forecast["winddirection_10m_dominant"]["value"])
+          )
+          pdf.text self.get_weather_field_string(
+            "Shortwave Radiation Sum", 
+            self.weather_variable_to_s(daily_forecast["shortwave_radiation_sum"])
+          )
+          pdf.move_down 40
+        end
       end
+      Console.success("Successfully exported weekly forecast to #{filename}!")
     else
       Console.info("Aborting PDF generation...")
     end
+  end
+
+  def get_weather_field_string(label, value)
+    weather_field_string = label
+    weather_field_string += ("-" * (30 - label.length) + "> ")
+    weather_field_string += value
   end
 
   def exit_gracefully
