@@ -309,6 +309,7 @@ class App
 
   def print_coming_week_weather(place_name, weather_info)
     Console.info("Coming week's weather for #{place_name}:")
+    # Destructure weather info:
     daily_variables = weather_info["daily_variables"]
     daily_units = weather_info["daily_units"]
     times = daily_variables["time"]
