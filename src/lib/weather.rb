@@ -163,7 +163,7 @@ module Weather
     when 81
       "moderate rain showers"
     when 82
-      "voilent rain showers" # LOL
+      "violent rain showers" # LOL
     when 85
       "light snow showers"
     when 86
