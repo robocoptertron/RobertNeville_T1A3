@@ -79,7 +79,31 @@ class App
   end
 
   def history(args)
-    puts args
+    self.print_welcome_message
+    begin
+      while true
+        history_date = self.select_history_date
+        if !history_date
+          self.exit_gracefully
+        end
+      end
+    rescue SignalException
+      self.exit_gracefully
+    end
+  end
+
+  def select_history_date
+    message = "Select a date to view history entries:"
+    options = []
+    @config_manager.history["history"].each { |history_item| options.push(history_item["date"])}
+    options.uniq!
+    options.push("Cancel")
+    choice_index = Console.select(message, options)
+    if choice_index == options.length - 1
+      # The user selected cancel
+      return
+    end
+    options[choice_index]
   end
 
   def exit_gracefully
