@@ -107,6 +107,7 @@ class App
   end
 
   def exit_gracefully
+    puts
     Console.info("Thanks for using CLIMate!")
     Console.info("Exiting")
     exit
