@@ -122,6 +122,16 @@ class ConfigManager
     end
   end
 
+  # Purge methods
+
+  def purge_history
+    @history["history"] = []
+    error = self.save_config_file(HISTORY_FILE, @history)
+    if error
+      error
+    end
+  end
+
   private
 
   # Save methods:

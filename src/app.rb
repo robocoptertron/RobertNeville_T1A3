@@ -123,8 +123,21 @@ class App
       rescue SignalException
         self.exit_gracefully
       end
+    when 1
+      case args[0]
+      when "purge"
+        if Console.yes?("Are you sure you want to purge your CLIMate history?")
+          error = @config_manager.purge_history
+          if error
+            Console.error(error)
+          else
+            Console.success("Purge successful!")
+          end
+        else
+          Console.info("Aborting purge")
+        end
+      end
     end
-    
   end
 
   def select_history_date
