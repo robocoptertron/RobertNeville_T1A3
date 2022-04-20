@@ -44,7 +44,8 @@ module Weather
     timezone_param = "timezone=#{timezone}"
     response = nil
     begin
-      response = HTTP.get("#{API_URL}#{latitude_param}&#{longitude_param}&#{current_weather_param}&#{timezone_param}")
+      params = "#{latitude_param}&#{longitude_param}&#{current_weather_param}&#{timezone_param}"
+      response = HTTP.get("#{API_URL}#{params}")
     rescue HTTP::ConnectionError
       message = "Oops - there was a connection error. Make sure you're connected to the internet."
       {"error" => message}
@@ -77,7 +78,8 @@ module Weather
     timezone_param = "timezone=#{timezone}"
     response = nil
     begin
-      response = HTTP.get("#{API_URL}#{latitude_param}&#{longitude_param}&daily=#{daily_weather_variables}&#{timezone_param}")
+      params = "#{latitude_param}&#{longitude_param}&daily=#{daily_weather_variables}&#{timezone_param}"
+      response = HTTP.get("#{API_URL}#{params}")
     rescue HTTP::ConnectionError
       message = "Oops - there was a connection error. Make sure you're connected to the internet."
       {"error" => message}

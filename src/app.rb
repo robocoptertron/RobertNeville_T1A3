@@ -535,7 +535,8 @@ class App
       if filename_input.match(/\.pdf$/)
         add_pdf_extension = false
       end
-      filename = @config_manager.general_config["output"] + "/#{filename_input}" + (add_pdf_extension ? ".pdf" : "")
+      basename = filename_input + (add_pdf_extension ? ".pdf" : ""
+      filename = @config_manager.general_config["output"] + "/#{basename}" )
     end
     
     proceed = true

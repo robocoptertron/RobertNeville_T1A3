@@ -9,7 +9,8 @@ module Help
 
     config_option = OptionInfo.new("config", "c", "Interact with the configuration system")
     config_option.add_arg("list", "lists all configuration variables", 0)
-    config_option.add_arg("set", "sets a specified configuration variable to the next command line argument provided", 2)
+    config_option.add_arg("set", 
+      "sets a specified configuration variable to the next command line argument provided", 2)
     options.push(config_option)
 
     history_option = OptionInfo.new("history", "H", "Interact with the history system")
