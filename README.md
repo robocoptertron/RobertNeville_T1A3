@@ -8,7 +8,7 @@ that place - based on the place's latitude and longitude.
 
 ## APIs Used
 
-This app has made use of the following free APIs:
+This app has made use of the following free APIs^:
 
 - WorldTimeAPI : [http://worldtimeapi.org](http://worldtimeapi.org)
 - Nominatim : [https://nominatim.org](https://nominatim.org)
@@ -22,6 +22,8 @@ running the application.
 **Open-Meteo** has been used for fetching current and weekly weather forecast
 data for a given latitude and longitude.
 
+^*None of these APIs require a key*.
+
 ## Source Control Repository
 
 The code for this project can be found at 
@@ -31,8 +33,9 @@ The code for this project can be found at
 
 This project has been written with the Airbnb Ruby Style Guide in mind.
 In some cases, the maximum line length of 100 characters has been voilated 
-to facilitate readability by less than 10% maximum.
+by less than 10% to facilitate readability.
 
 The Airbnb Ruby Style Guide can be found at 
 [https://github.com/airbnb/ruby](https://github.com/airbnb/ruby).
+
 
