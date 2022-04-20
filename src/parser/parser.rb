@@ -11,9 +11,9 @@ class Parser
   def parse(argv)
     @parser.exec(argv)
     results = {
-      args: @parser.parsed_args, 
-      options: @parser.parsed_options, 
-      errors: @parser.errors
+      "args" => @parser.parsed_args, 
+      "options" => @parser.parsed_options, 
+      "errors" => @parser.errors
     }
     results
   end
