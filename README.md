@@ -39,4 +39,28 @@ by less than 10% to facilitate readability.
 The Airbnb Ruby Style Guide can be found at 
 [https://github.com/airbnb/ruby](https://github.com/airbnb/ruby).
 
+## Application Features
 
+CLIMate combines the following high-level features into a cohesive weather
+forecasting service:
+
+1. It integrates place name search functionality, enabling users to choose
+from a list of places found to match their query.
+2. Users can view current weather conditions for their chosen place name.
+3. Users can view weekly weather forecasts for their chosen place name.
+4. Users can save current or weekly weather data in their history for
+later reference.
+5. A user's current location can be cached to 'user locations' for 
+convenience and faster app performance.
+6. Arbitraty locations can be saved to the user's 'favourites' for 
+convenience and faster app performance.
+7. It offers a PDF export option for weekly weather forecasts (the user's
+exports directory can be easily configured during app setup, or via use
+of the `--config` command line option).
+
+These features have been implemented with comprehensive use of Ruby
+programming constructs.
+
+## Implementation Plan
+
+CLIMate has been designed with an object oriented application architecture.
