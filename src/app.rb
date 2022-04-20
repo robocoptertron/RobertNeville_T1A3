@@ -136,6 +136,8 @@ class App
         else
           Console.info("Aborting purge")
         end
+      else
+        Console.error("Invalid argument '#{args[0]}' for history option.")
       end
     end
   end

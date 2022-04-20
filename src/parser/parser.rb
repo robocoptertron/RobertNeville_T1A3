@@ -5,7 +5,7 @@ class Parser
     @parser = ArgumentParser.new
     @parser.add_option("help", "h", false, false, false, 0, 0)
     @parser.add_option("config", "c", true, false, false, 1, 3)
-    @parser.add_option("history", "H", true, false, false, 0, 2)
+    @parser.add_option("history", "H", true, false, false, 0, 1)
   end
 
   def parse(argv)
