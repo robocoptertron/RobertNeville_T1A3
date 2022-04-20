@@ -33,13 +33,13 @@ class ArgumentParser
   # max_args -> integer indicating the maximum number of arguments for the option.
   def add_option(name, shorthand, accepts_args, key_value, groupable, min_args, max_args)
     @options.push({
-      name: name,
-      shorthand: shorthand,
-      accepts_args: accepts_args,
-      key_value: key_value,
-      groupable: groupable,
-      min_args: min_args,
-      max_args: max_args
+      "name" => name,
+      "shorthand" => shorthand,
+      "accepts_args" => accepts_args,
+      "key_value" => key_value,
+      "groupable" => groupable,
+      "min_args" => min_args,
+      "max_args" => max_args
     })
   end
 
@@ -83,29 +83,29 @@ class ArgumentParser
             # The option is in the form of a 
             # key/value pair
 
-            parsed_opt[:name] = self.get_option_key(current_arg)
+            parsed_opt["name"] = self.get_option_key(current_arg)
 
-            if !self.is_valid_option(parsed_opt[:name])
+            if !self.is_valid_option(parsed_opt["name"])
               # Not a valid option - add error to
               # the list of parsing errors:
-              message = "'#{parsed_opt[:name]}' is not a key/value option."
+              message = "'#{parsed_opt["name"]}' is not a key/value option."
               @errors.push(message)
             else
               # Valid option - add option 
               # to the parsed options list:
-              parsed_opt[:key_value] = true
-              parsed_opt[:value] = self.get_option_value(current_arg)
+              parsed_opt["key_value"] = true
+              parsed_opt["value"] = self.get_option_value(current_arg)
               parsed_options.push(parsed_opt)
             end
 
             current_arg_index += 1
             next
         else
-          parsed_opt[:name] = current_arg[2..-1]
+          parsed_opt["name"] = current_arg[2..-1]
         end
       end
 
-      if !parsed_opt[:name]
+      if !parsed_opt["name"]
         # Option name has not been set yet
 
         # The option is in shorthand form (may be a group of options):
@@ -130,14 +130,14 @@ class ArgumentParser
         elsif valid_options.length == 1
           # There is only one option -
           # it might accept arguments:
-          parsed_opt[:name] = self.get_option_name_from_shorthand(valid_options[0])
+          parsed_opt["name"] = self.get_option_name_from_shorthand(valid_options[0])
         else
           # There are multiple options, so
           # none of them will accept arguments.
           # Add each to the parsed options list:
           valid_options.each do |opt|
             @parsed_options.push({
-              name: self.get_option_name_from_shorthand(opt)
+              "name" => self.get_option_name_from_shorthand(opt)
             })
           end
           current_arg_index += 1
@@ -147,18 +147,18 @@ class ArgumentParser
 
       current_arg_index += 1
 
-      if !self.is_valid_option(parsed_opt[:name])
+      if !self.is_valid_option(parsed_opt["name"])
         # The argument is an invalid option - add a new
         # error to the list and start analysing the next
         # argument:
-        message = "#{parsed_opt[:name]} is not a valid option."
+        message = "#{parsed_opt["name"]} is not a valid option."
         @errors.push(message)
         next
       end
 
-      config_opt = self.get_option_by_name(parsed_opt[:name])
+      config_opt = self.get_option_by_name(parsed_opt["name"])
       
-      if !config_opt[:accepts_args]
+      if !config_opt["accepts_args"]
         # The option does not accept arguments -
         # add the option to the list of parsed
         # options
@@ -183,18 +183,18 @@ class ArgumentParser
 
         current_arg_index += 1
 
-        break if option_arguments.length == config_opt[:max_args]
+        break if option_arguments.length == config_opt["max_args"]
       end
 
-      if option_arguments.length < config_opt[:min_args]
+      if option_arguments.length < config_opt["min_args"]
         # The number of arguments provided for the
         # option is less than the minimum required:
-        message = "#{parsed_opt[:name]} requires a minimum of #{config_opt[:min_args]} arguments."
+        message = "#{parsed_opt["name"]} requires a minimum of #{config_opt["min_args"]} arguments."
         @errors.push(message)
         next
       end
 
-      parsed_opt[:args] = option_arguments
+      parsed_opt["args"] = option_arguments
 
       @parsed_options.push(parsed_opt)
     end
@@ -229,16 +229,16 @@ class ArgumentParser
   end
 
   def is_valid_option(name)
-    @options.select { |option| option[:name] == name || option[:shorthand] == name }.length > 0
+    @options.select { |option| option["name"] == name || option["shorthand"] == name }.length > 0
   end
 
   def get_option_name_from_shorthand(shorthand)
-    matching_opts = @options.select { |option| option[:shorthand] == shorthand }
-    matching_opts[0] ? matching_opts[0][:name] : nil
+    matching_opts = @options.select { |option| option["shorthand"] == shorthand }
+    matching_opts[0] ? matching_opts[0]["name"] : nil
   end
 
   def get_option_by_name(name)
-    matching_opts = @options.select { |opt| opt[:name] == name }
+    matching_opts = @options.select { |opt| opt["name"] == name }
     matching_opts[0]
   end
 end
