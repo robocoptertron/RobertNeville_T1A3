@@ -21,13 +21,13 @@ class App
     if !option
       self.main_loop
     else
-      case option[:name]
+      case option["name"]
       when "help"
         self.help
       when "config"
-        self.config(option[:args])
+        self.config(option["args"])
       when "history"
-        self.history(option[:args])
+        self.history(option["args"])
       end
     end
   end

@@ -18,16 +18,16 @@ end
 parser = Parser.new # Initialize command line argument parser.
 results = parser.parse(ARGV)
 
-if results[:errors].length > 0
+if results["errors"].length > 0
   # There were parsing errors, so display them and exit:
   Console.info("Please fix the following command line argument errors:")
-  results[:errors].each_with_index do |error, i|
+  results["errors"].each_with_index do |error, i|
     Console.error("#{i + 1}. #{error}")
   end
   exit
 end
 
-arguments = results[:args]
+arguments = results["args"]
 
 if arguments.length > 0
   # This application does not support 
@@ -39,7 +39,7 @@ if arguments.length > 0
   exit
 end
 
-options = results[:options]
+options = results["options"]
 
 if options.length > 1
   # This application does not support
