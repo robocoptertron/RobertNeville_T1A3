@@ -80,22 +80,57 @@ class App
 
   def history(args)
     self.print_welcome_message
-    begin
-      while true
-        history_date = self.select_history_date
-        if !history_date
-          self.exit_gracefully
+    case args.length
+    when 0
+      begin
+        while true
+          if @config_manager.history["history"].length == 0
+            Console.info("You don't have any history entries.")
+            break
+          end
+
+          history_date = self.select_history_date
+          if !history_date
+            # The user selected cancel
+            self.exit_gracefully
+          end
+
+          history_entries = self.get_history_entries_from_date(history_date)
+          
+          history_entry = self.select_history_entry(history_entries)
+          if !history_entry
+            # THe user selected cancel
+            self.exit_gracefully
+          end
+
+          case history_entry["forecast_type"]
+          when CURRENT
+            self.print_current_weather(history_entry["location"], history_entry["weather_data"])
+          when COMING_WEEK
+            output_type = self.select_output_type
+            case output_type
+            when PRINT_TO_CONSOLE
+              self.print_coming_week_weather(history_entry["location"], history_entry["weather_data"])
+            when EXPORT_TO_PDF
+              self.generate_forecast_pdf(history_entry["location"], history_entry["weather_data"])
+            end
+          end
+
+          if !Console.yes?("Would you like to view more of your history?")
+            self.exit_gracefully
+          end
         end
+      rescue SignalException
+        self.exit_gracefully
       end
-    rescue SignalException
-      self.exit_gracefully
     end
+    
   end
 
   def select_history_date
     message = "Select a date to view history entries:"
     options = []
-    @config_manager.history["history"].each { |history_item| options.push(history_item["date"])}
+    @config_manager.history["history"].each { |entry| options.push(entry["date"])}
     options.uniq!
     options.push("Cancel")
     choice_index = Console.select(message, options)
@@ -104,6 +139,25 @@ class App
       return
     end
     options[choice_index]
+  end
+
+  def get_history_entries_from_date(date)
+    @config_manager.history["history"].select { |entry| entry["date"] == date}
+  end
+
+  def select_history_entry(entries)
+    message = "Select the entry you would like to view from the list below:"
+    options = []
+    entries.each do |entry| 
+      options.push("#{entry["forecast_type"]} @ #{entry["time"]}: #{entry["location"]}")
+    end
+    options.push("Cancel")
+    choice_index = Console.select(message, options)
+    if choice_index == options.length - 1
+      # The user selected cancel
+      return
+    end
+    entries[choice_index]
   end
 
   def exit_gracefully
