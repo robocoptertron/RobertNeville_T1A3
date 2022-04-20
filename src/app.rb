@@ -2,6 +2,7 @@ require "prawn"
 
 require_relative "./lib/console"
 require_relative "./lib/geocode"
+require_relative "./lib/help"
 require_relative "./lib/timezone"
 require_relative "./lib/weather"
 
@@ -35,7 +36,9 @@ class App
   private
 
   def help
-    puts "Usage information for CLIMate"
+    puts
+    Console.info("Usage guide for CLIMate:")
+    Help.display
   end
 
   def config(args)
