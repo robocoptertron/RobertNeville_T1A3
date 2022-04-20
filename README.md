@@ -25,5 +25,14 @@ data for a given latitude and longitude.
 ## Source Control Repository
 
 The code for this project can be found at 
-[https://github.com/robocoptertron/RobertNeville_T1A3](https://github.com/robocoptertron/RobertNeville_T1A3)
+[https://github.com/robocoptertron/RobertNeville_T1A3](https://github.com/robocoptertron/RobertNeville_T1A3).
+
+## Coding Style Guide
+
+This project has been written with the Airbnb Ruby Style Guide in mind.
+In some cases, the maximum line length of 100 characters has been voilated 
+to facilitate readability by less than 10% maximum.
+
+The Airbnb Ruby Style Guide can be found at 
+[https://github.com/airbnb/ruby](https://github.com/airbnb/ruby).
 
