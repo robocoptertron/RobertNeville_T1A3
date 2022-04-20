@@ -14,6 +14,8 @@ This app has made use of the following free APIs^:
 - Nominatim : [https://nominatim.org](https://nominatim.org)
 - Open-Meteo : [https://open-meteo.com](https://open-meteo.com)
 
+^*None of these APIs require a key*.
+
 **WorldTimeAPI** has been used for determining the users' timezone when
 running the application.
 
@@ -22,7 +24,6 @@ running the application.
 **Open-Meteo** has been used for fetching current and weekly weather forecast
 data for a given latitude and longitude.
 
-^*None of these APIs require a key*.
 
 ## Source Control Repository
 
