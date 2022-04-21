@@ -49,7 +49,8 @@ from a list of places found to match their query.
 2. Users can view current weather conditions for their chosen place name.
 3. Users can view weekly weather forecasts for their chosen place name.
 4. Users can save current or weekly weather data in their history for
-later reference.
+later reference (perusable by starting the app with it's `--history`
+command line option).
 5. A user's current location can be cached to 'user locations' for 
 convenience and faster app performance.
 6. Arbitraty locations can be saved to the user's 'favourites' for 
@@ -63,4 +64,54 @@ programming constructs.
 
 ## Implementation Plan
 
-CLIMate has been designed with an object oriented application architecture.
+### Overview
+
+CLIMate will be implemented with an object oriented approach. The primary 
+application logic will be contained in an `App` class, and a `ConfigManager`
+class will be created to handle the app's configuration. These two
+classes will be instantiated in the app's entry point `main.rb`, wherein
+initial command line argument processing will also take place. 
+
+The constructor
+for `App` will take a `ConfigManager` object as its only argument, and
+will include an `exec` function to initiate the program's primary logic.
+This function will operate on the command line arguments passed to the 
+program, and will determine weather the user will interact with the
+main CLIMate loop or the history or config subsystems.
+
+A Bash script will be written to handle application setup - to install
+all dependencies, create the configuration directory, 
+and launch the app if the user so desires. The configuration directory
+will contain the following four JSON configuration files, which will
+be initialised with default content by the setup script:
+
+1. `config.json`
+2. `locations.json`
+3. `favourites.json`
+4. `history.json`
+
+These files will store the app's general configuration, the user's
+saved and favourite locations, and their forecast history, respectively.
+
+The user will also have the option to specify the directory to be used for
+PDF exports when following the setup procedure (this can also be changed
+after setup by launching the app with the `--config` option and 
+the `set` argument).
+
+All API related methods will be implemented in separate modules - each 
+pertaining to the one API.
+
+### ArgumentParser
+
+Prior to the commencement of this project, I was working on re-writing
+a command line argument parser class, that I had partially implemented in
+C++. I thought I might be able to use it in this project.
+
+I discovered a Ruby gem available called `optparse` that can be used to parse
+command line arguments. However, after experimentation with the package,
+I decided that I would finish the custom argument parser that I was developing; 
+`optparse` was not well documented and awkward to use.
+
+CLIMate will include the custom '`ArgumentParser`' class.
+
+### Flowchart of `App` Class `main_loop` Method
