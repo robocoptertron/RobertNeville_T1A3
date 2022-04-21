@@ -13,9 +13,14 @@ module Geocode
       message = "Oops - there was a connection error. Make sure you're connected to the internet."
       {"error" => message}
     else
+      # The fetch operation was completed:
       if response.status.server_error?
+        # The request was received but there
+        # was a server error:
         {"error" => "Oops - there was a server error. You might have to try again later."}
       end
+      # Parse and process the data into
+      # a format that is easier to work with:
       data = response.parse
       places_found = []
       data.each do |place_found|
@@ -26,6 +31,7 @@ module Geocode
           "longitude" => place_found["lon"]
         })
       end
+      # Return the data:
       {"places_found" => places_found}
     end
   end
