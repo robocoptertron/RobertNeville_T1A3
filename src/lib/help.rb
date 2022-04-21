@@ -2,11 +2,16 @@ require "colorize"
 
 module Help
   def Help.display
+    # Display help information for the app:
+
     puts "./start.sh [option] [option_arg, ...]".yellow
     puts
 
     options = []
 
+    # Add command line option usage information 
+    # to the list for each option accepted
+    # by the app:
     config_option = OptionInfo.new("config", "c", "Interact with the configuration system")
     config_option.add_arg("list", "lists all configuration variables", 0)
     config_option.add_arg("set", 
@@ -16,11 +21,14 @@ module Help
     history_option = OptionInfo.new("history", "H", "Interact with the history system")
     history_option.add_arg("purge", "Clears your weather forecast history", 0)
     options.push(history_option)
-
+    
+    # Output heading:
     puts "-----------------------------------------------------------"
     puts "VALID OPTIONS".green
-    
+
     options.each do |option|
+      # For each of the options,
+      # display usage information:
       puts "-----------------------------------------------------------"
       puts "--#{option.name}".yellow
       puts
@@ -47,6 +55,8 @@ module Help
   private
 
   class OptionInfo
+    # Class for objects that store
+    # option usage information:
     attr_reader :name, :shorthand, :description, :args
 
     def initialize(name, shorthand, description)
