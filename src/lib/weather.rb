@@ -50,15 +50,23 @@ module Weather
       message = "Oops - there was a connection error. Make sure you're connected to the internet."
       {"error" => message}
     else
+      # The fetch operation completed:
       if response.status.server_error?
+        # The request was received but
+        # there was a server error:
         {"error" => "Oops - there was a server error. You might have to try again later."}
       end
+      # Occasionally an HTML page is returned
+      # by this API. Make sure the response
+      # data is parsable:
       data = nil
       begin
         data = response.parse
       rescue => e
         {"error" => "There was a problem parsing the data returned by the API: #{e.message}"}
       else
+        # All good. Process the data for the app
+        # and return it:
         current_weather = data["current_weather"]
         {
           "time" => current_weather["time"], 
@@ -84,21 +92,36 @@ module Weather
       message = "Oops - there was a connection error. Make sure you're connected to the internet."
       {"error" => message}
     else
+      # The fetch operation completed:
       if response.status.server_error?
+        # The request was received but
+        # there was a server error:
         {"error" => "Oops - there was a server error. You might have to try again later."}
       end
+      # Occasionally an HTML page is returned
+      # by this API. Make sure the response
+      # data is parsable:
       data = nil
       begin
         data = response.parse
       rescue => e
         {"error" => "There was a problem parsing the data returned by the API: #{e.message}"}
       else
+        # All good. Process the data for the app
+        # and return it:
         {"coming_week_weather" => Weather.process_coming_week_weather(data["daily"], data["daily_units"])}
       end
     end
   end
 
   def Weather.process_coming_week_weather(daily_variables, daily_units)
+    # Generate an array of weather info hashes,
+    # with each hash containing a single key - 
+    # with the same name as the weather variable
+    # returned by the API - that is assigned to
+    # an internal hash storing the weather variable's
+    #  "value" and "unit". Return the resulting
+    # array:
     coming_week_weather = []
     for day in 0..6 do
       weather_info = {}
@@ -114,11 +137,22 @@ module Weather
   end
 
   def Weather.translate_wind_direction(wind_direction_degrees)
+    # This method translates a given wind direction
+    # in degrees to its corresponding compass direction.
+    # There are 16 compass wind directions, and each
+    # direction corresponds with a 22.5 degree segment
+    # of the compass. Divide the wind direction degrees
+    # by the segment magnitude and round down to get
+    # the index of the corresponding nominal wind direction:
     compass_segment = (wind_direction_degrees / DEGREES_IN_COMPASS_SEGMENT).floor
     WIND_DIRECTIONS[compass_segment]
   end
 
   def Weather.translate_weather_code(weather_code)
+    # This method translates a wheather
+    # code to its corresponding condition
+    # description (all descriptions) sourced
+    # from Open-Meteo):
     case weather_code
     when 0
       "clear sky"
