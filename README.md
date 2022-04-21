@@ -126,4 +126,4 @@ CLIMate will include the custom '`ArgumentParser`' class.
 ![get weather process flowchart](./docs/get-weather-flowchart.png)
 
 #### 'display forecast' subprocess
-![display forecast process flowchart](./docs/print-weather-flowchart.png)
+![display forecast process flowchart](./docs/display-forecast-flowchart.png)
