@@ -127,3 +127,33 @@ CLIMate will include the custom '`ArgumentParser`' class.
 
 #### 'display forecast' subprocess
 ![display forecast process flowchart](./docs/display-forecast-flowchart.png)
+
+### App Implementation Steps
+
+The first step in the development of CLIMate will involve creating 
+`setup.sh`. As discussed in the Overview section earlier, this script
+will handle the creation of the configuration directory and it's 
+contained JSON files - initialising these files with default 
+configuration values.
+
+After this script has been implemented, the `ConfigManager` class
+will be written. This class will provide the logic of the
+configuration system and will be required to be at least partially
+implemented before the `App` class.
+
+Another class that needs to be finished before the `App` class is
+`ArgumentParser`. When this class is fully functional, then the
+the `exec` method of `App` can be worked on.
+
+The `App` class and all other modules will be implemented progressively
+once `ConfigManager` and `ArgumentParser` are complete - as the 
+`main_loop` method of `App` is formulated.
+
+It is important to note here that for the preliminary stages of
+the development of `ConfigManager` and `ArgumentParser`, the `main.rb`
+file (the app's main entry point) will be used for testing. When
+these two classes are complete, the app's bootstrap logic can be
+written and a call the `exec` method of `App` (with the parsed
+command line argumets as its argument) can be added as
+the final statement so that the `App` class can be tested as it 
+is implemented.
