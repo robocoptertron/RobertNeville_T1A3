@@ -117,7 +117,7 @@ CLIMate will include the custom '`ArgumentParser`' class.
 ### Flowcharts for `App` class `main_loop` method
 
 #### main_loop method
-![main_loop method flowchart](./docs/main_loop_flowchart.png)
+![main_loop method flowchart](./docs/main-loop-flowchart.png)
 
 #### 'get location' subprocess
 ![get location process flowchart](./docs/get-location-flowchart.png)
@@ -125,5 +125,5 @@ CLIMate will include the custom '`ArgumentParser`' class.
 #### 'get weather' subprocess
 ![get weather process flowchart](./docs/get-weather-flowchart.png)
 
-#### 'print weather' subprocess
-![print weather process flowchart](./docs/print-weather-flowchart.png)
+#### 'display forecast' subprocess
+![display forecast process flowchart](./docs/print-weather-flowchart.png)
