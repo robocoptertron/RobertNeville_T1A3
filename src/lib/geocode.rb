@@ -13,7 +13,7 @@ module Geocode
       message = "Oops - there was a connection error. Make sure you're connected to the internet."
       {"error" => message}
     else
-      # The fetch operation was completed:
+      # The fetch operation completed:
       if response.status.server_error?
         # The request was received but there
         # was a server error:
