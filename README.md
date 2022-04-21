@@ -157,3 +157,15 @@ written and a call the `exec` method of `App` (with the parsed
 command line argumets as its argument) can be added as
 the final statement so that the `App` class can be tested as it 
 is implemented.
+
+Regarding the features of the app's primary logic, all necessary
+methods will be implemented in sequence according to the
+flowcharts detailed above - the API methods will be created
+as required when the associated logic in `main_loop` is being
+worked on.
+
+During the planning stages of this project it is no clear to
+me exactly what and how many supporting methods will be required.
+These methods will be created on an as-the-need-is-realised basis.
+
+This implementation plan has been tracked using 

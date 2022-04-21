@@ -7,6 +7,7 @@ require_relative "./lib/timezone"
 require_relative "./lib/weather"
 
 class App
+  # Constants for selection options:
   LOCAL = "Local"
   ELSEWHERE = "Elsewhere"
   CURRENT = "Current"
@@ -19,6 +20,7 @@ class App
   end
 
   def exec(option)
+    # Determine the app's course of exectution:
     if !option
       self.main_loop
     else
@@ -46,6 +48,7 @@ class App
     when 1
       case args[0]
       when "list"
+        # Print all the configuration variables:
         self.print_config
       else
         Console.error("Invalid argument '#{args[0]}' for config option.")
@@ -53,6 +56,10 @@ class App
     when 3
       case args[0]
       when "set"
+        # Set the configuration variable specified
+        # by the second command line argument (args[1])
+        # to the value specified by the third command
+        # line argument (args[2]):
         self.set_config_option(args[1], args[2])
       else
         Console.error("Invalid argument '#{args[0]} for config option.'")
@@ -64,6 +71,8 @@ class App
     puts
     Console.info("Current CLIMate configuration:")
     @config_manager.general_config.each do |key, value|
+      # Print each of the configuration variables
+      # in the format variable_name-------------> value:
       print key.yellow
       print ("-" * (30 - key.length) + "> ").blue
       print value.to_s
@@ -73,6 +82,9 @@ class App
   end
 
   def set_config_option(key, value)
+    # Wrapper function for @config_manager.set_config_option,
+    # which displays an appropriate message based on the
+    # outcome:
     error = @config_manager.set_config_option(key, value)
     if error
       Console.error(error)
@@ -85,21 +97,30 @@ class App
     self.print_welcome_message
     case args.length
     when 0
+      # No arguments were included with the
+      # "history" option:
       begin
         while true
           if @config_manager.history["history"].length == 0
+            # No history entries so exit:
             Console.info("You don't have any history entries.")
             break
           end
 
+          # Prompt the user to select a date
+          # from their history entries:
           history_date = self.select_history_date
           if !history_date
             # The user selected cancel
             self.exit_gracefully
           end
 
+          # Get all history entries from 
+          # the date selected by the user:
           history_entries = self.get_history_entries_from_date(history_date)
           
+          # Prompt the user to select a history entry
+          # from the list retrieved:
           history_entry = self.select_history_entry(history_entries)
           if !history_entry
             # THe user selected cancel
@@ -108,8 +129,13 @@ class App
 
           case history_entry["forecast_type"]
           when CURRENT
+            # The forecast type of the history entry 
+            # is "Current". Print the data to the console:
             self.print_current_weather(history_entry["location"], history_entry["weather_data"])
           when COMING_WEEK
+            # The forecast type of the history entry
+            # is "Coming Week". Prompt the user
+            # to select an output type:
             output_type = self.select_output_type
             case output_type
             when PRINT_TO_CONSOLE
@@ -127,16 +153,24 @@ class App
         self.exit_gracefully
       end
     when 1
+      # Only one argument was included with the 
+      # history option:
       case args[0]
       when "purge"
+        # The argument is "purge". Confirm with the
+        # user if they would like to proceed:
         if Console.yes?("Are you sure you want to purge your CLIMate history?")
           error = @config_manager.purge_history
           if error
+            # An error was encountered whilst
+            # overwriting the configuration - 
+            # likely a filesystem error:
             Console.error(error)
           else
             Console.success("Purge successful!")
           end
         else
+          # Cancel history purge:
           Console.info("Aborting purge")
         end
       else
