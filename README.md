@@ -114,4 +114,16 @@ I decided that I would finish the custom argument parser that I was developing;
 
 CLIMate will include the custom '`ArgumentParser`' class.
 
-### Flowchart of `App` Class `main_loop` Method
+### Flowcharts for `App` class `main_loop` method
+
+#### main_loop method
+![main_loop method flowchart](./docs/main_loop_flowchart.png)
+
+#### 'get location' subprocess
+![get location process flowchart](./docs/get-location-flowchart.png)
+
+#### 'get weather' subprocess
+![get weather process flowchart](./docs/get-weather-flowchart.png)
+
+#### 'print weather' subprocess
+![print weather process flowchart](./docs/print-weather-flowchart.png)
