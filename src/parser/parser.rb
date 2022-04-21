@@ -2,6 +2,9 @@ require_relative "./argument_parser"
 
 class Parser
   def initialize
+    # Instantiate a new ArgumentParser
+    # and configure it with all valid
+    # options for the app:
     @parser = ArgumentParser.new
     @parser.add_option("help", "h", false, false, false, 0, 0)
     @parser.add_option("config", "c", true, false, false, 1, 3)
