@@ -6,6 +6,57 @@ users to search for any valid location around the globe by place name,
 and can then be used to fetch current or weekly forecast data for
 that place - based on the place's latitude and longitude.
 
+## Usage
+
+To setup the application, please run the `setup.sh` script from the command
+line (you must be in this project's root directory):
+
+```
+./setup.sh
+```
+
+All app dependencies will be installed, and you will be asked some 
+configuration questions. The app can be launched after the setup script
+has finished (`setup.sh` will ask if you would like to launch CLIMate). 
+
+For future execution of the app, you can use the following commands:
+
+```
+./start.sh
+
+# or 
+
+ruby src/main.rb
+```
+
+### Command Line Options
+
+To view CLIMate option help, please issue one of the above commands
+with the `--help` option (`-h` shorthand):
+
+```
+./start.sh --help
+
+# or
+
+./start.sh -h
+
+```
+
+You will be presented with the CLIMate usage guide.
+
+In addition to the `--help` option, there are options for interacting
+with the configuration and history subsystems:
+
+- `--config` (`-c` shorthand) can be used to view and set the app's 
+configuration variables.
+
+- `--history` (`-H` shortand) can be used to peruse or clear your forecast
+history.
+
+Details on how to use these options can be found by running the app with the
+`--help` option.
+
 ## APIs Used
 
 This app has made use of the following free APIs^:
