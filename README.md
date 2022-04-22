@@ -164,8 +164,56 @@ flowcharts detailed above - the API methods will be created
 as required when the associated logic in `main_loop` is being
 worked on.
 
+All features outlined in the above flowchart will be implmented
+as methods of the `App` class, with API calls handled by the methods
+defined in the respective modules.
+
+Following the logic outlined in the `main_loop` flowchart,
+the features of the CLIMate's primary logic will be implemented
+in the following order:
+
+1. Work on the 'fetch timezone' process (required for fetching weather 
+forecast data through Open-Meteo).
+
+2. Work on the 'select location type' process.
+
+3. Work on the 'get location' subprocess. The course of execution for this
+feature will depend on the location type, and will involve the
+following functionality:
+
+    - If the location type is "local", check if the user has any saved
+    user locations. If so, prompt the user to select one of those locations
+    or "somewhere else".
+
+    - If the location type is "elsewhere", check if the user has any saved
+    favourites. If so, ask the user if they would like to select from 
+    those locations, or search for a new one.
+
+    - If a location is not selected at this point, the user will enter
+    a place name search loop. They will exit the loop if they search for
+    a valid place name and select one from the list of alternatives.
+
+4. Work on the 'select forecast type' process (required for determining
+the type of weather data to fetch in the following step).
+
+5. Work on the 'get forecast' subprocess. This is similar to the
+'get location' subprocess in that it is dependent on the forecast type.
+It will involve the following functionality:
+
+    - If the forecast type is "current", fetch the current weather
+    for the location selected in the 'get location' subprocess.
+
+    - If the forecast type is "coming week", fetch the coming week's
+    weather for the location selected in the 'get location' subprocess.
+    Ask the user if they would like the data to be displayed in their
+    console or exported to a PDF. Complete the display process, by 
+    carrying out one of the two options.
+
+6. Work on implemented the history feature - the user will be asked
+if they would like to save the weather data fetched to their history, and
+do so if they respond with 'yes'.
+
 During the planning stages of this project it is no clear to
 me exactly what and how many supporting methods will be required.
 These methods will be created on an as-the-need-is-realised basis.
 
-This implementation plan has been tracked using 
