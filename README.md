@@ -98,7 +98,7 @@ The code for this project can be found at
 
 This project has been written with the Airbnb Ruby Style Guide in mind.
 In some cases, the maximum line length of 100 characters has been voilated 
-by less than 10% to facilitate readability.
+by less than 10% to maintain readability.
 
 The Airbnb Ruby Style Guide can be found at 
 [https://github.com/airbnb/ruby](https://github.com/airbnb/ruby).
