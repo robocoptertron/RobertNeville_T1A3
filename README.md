@@ -57,6 +57,19 @@ history.
 Details on how to use these options can be found by running the app with the
 `--help` option.
 
+## Environment
+
+CLIMate has been developed on a Linux machine running Ubuntu 20.04 LTS, using
+Ruby version `3.0.3p157`, and has the following gem dependencies:
+
+- `http` ~> 5.0
+- `json` ~> 2.6
+- `tty-prompt` ~> 0.23.1
+- `colorize` ~> 0.8.1
+- `prawn` ~> 2.4
+
+It has not been tested in any other operating system environments.
+
 ## APIs Used
 
 This app has made use of the following free APIs^:
