@@ -281,3 +281,4 @@ During the planning stages of this project it is no clear to
 me exactly what and how many supporting methods will be required.
 These methods will be created on an as-the-need-is-realised basis.
 
+All planning for this project has been tracked on the following Trello board: [T1A3 Planning](https://trello.com/b/mJATXrPm/t1a3-planning).
