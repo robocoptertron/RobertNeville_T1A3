@@ -281,4 +281,26 @@ During the planning stages of this project it is no clear to
 me exactly what and how many supporting methods will be required.
 These methods will be created on an as-the-need-is-realised basis.
 
+### Implementation Timeline
+
+**11/04/2022** | Assessment is released.
+
+**13/04/2022** | Finish `setup.sh`.
+
+**14/04/2022** | Finish `ArgumentParser`.
+
+**16/04/2022** | Finish `ConfigManager`.
+
+**19/04/2022** | Finish supporting modules (`timezone`, `geocode`, & `weather`).
+
+**19/04/2022** | Finish `App` class `main_loop` method.
+
+**20/04/2022** | Finish `App` class `help` method.
+
+**20/04/2022** | Finish `App` class `history` method.
+
+**20/04/2022** | Finish `App` class `config` method.
+
+**24/04/2022** | Finish testing.
+
 All planning for this project has been tracked on the following Trello board: [T1A3 Planning](https://trello.com/b/mJATXrPm/t1a3-planning).
