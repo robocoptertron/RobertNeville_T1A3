@@ -121,7 +121,49 @@ with 1 or more `CONFIG ERROR` messages, the test has succeeded.
 
 ## Suite 2: app.rb
 
-### T01 | Main loop - determine timezone
+### **T01** | Main loop - CTRL+C
+
+**Description**: when running CLIMate, the app should exit gracefully and
+notify the user that it is exiting when the Ctrl+C key combination is issued.
+
+**Preconditions**:
+
+1. The application's repository must be cloned to the user's device.
+2. The user must have already executed `setup.sh` successfully.
+3. The user's current working directory must be the root directory
+of the repository.
+
+**Test Steps**:
+
+1. Launch the application by issuing one of the following commands:
+```
+./start.sh
+
+# or
+
+ruby src/main.rb
+```
+2. Issue the CTRL+C key combination.
+
+**Expected Results**: the application should exit gracefully and display
+messages to notify the user, such as the following:
+
+```
+Welcome to CLIMate! You can use CTRL+C to exit at any time :)
+
+Determining your timezone...
+
+Your timezone was detected as Australia/Sydney.
+
+Please select a location type: (Press ↑/↓ arrow to move and Enter to select)
+‣ Local
+  Elsewhere
+Thanks for using CLIMate!
+
+Exiting
+```
+
+### **T02** | Main loop - determine timezone
 
 **Description**: when running CLIMate, the app should correctly determine the 
 timezone of the user and notify the user.
@@ -159,4 +201,99 @@ Please select a location type: (Press ↑/↓ arrow to move and Enter to select)
   Elsewhere
 ```
 
+**Exceptional Results**: The application should print output similar to the
+following if there is no internet connection:
+
+```
+Welcome to CLIMate! You can use CTRL+C to exit at any time :)
+
+Determining your timezone...
+
+Oops - there was a connection error. Make sure you're connected to the internet.
+
+CLIMate needs to know your timezone to fetch forecasts.
+
+
+Thanks for using CLIMate!
+
+Exiting
+```
+
 where 'Australia/Sydney` should be substituted with the user's current timezone.
+
+### **T03** | Main loop - place name search
+
+**Description**: when running CLIMate, the app should display a list of all
+locations for a valid place name entered by the user.
+
+**Preconditions**:
+
+1. The application's repository must be cloned to the user's device.
+2. The user must have already executed `setup.sh` successfully.
+3. The user's current working directory must be the root directory
+of the repository.
+
+**Test Steps**:
+
+1. Launch the application by issuing one of the following commands:
+```
+./start.sh
+
+# or
+
+ruby src/main.rb
+```
+2. When prompted to select a location type, enter either of the 2 alternatives.
+4. When prompted to enter a place name, enter a place name that is known to be
+valid for a real location.
+
+**Expected Results**: the user should be presented with output similar to the following
+(this example uses Brisbane as input):
+
+```
+Welcome to CLIMate! You can use CTRL+C to exit at any time :)
+
+Determining your timezone...
+
+Your timezone was detected as Australia/Melbourne.
+
+Please select a location type: Local
+
+Enter a place name for your current location: Brisbane
+
+Searching for 'Brisbane' geocode info...
+
+Please choose the correct location from the following list of alternatives: (Press ↑/↓/←/→ arrow to move and Enter to select)
+‣ Brisbane City, Queensland, Australia
+  Brisbane, San Mateo County, California, 94005, United States
+  Brisbane, Will County, Illinois, 60451, United States
+  Brisbane, Erin, Wellington County, Southwestern Ontario, Ontario, N0B 1T0, Canada
+  Brisbane, Grant County, North Dakota, United States
+  Brisbane, Vista Real Classica, 2nd District, Quezon City, Eastern Manila District, Metro Manila, 1100, Philippines
+  ...
+```
+
+The user should the location they are searching for in the list of alternatives
+(distinguishable from all alternatives by the full location name).
+
+**Exceptional Results**: if the place name entered by the user is not valid
+for a real location, output similar to the following can be expected:
+
+```
+Welcome to CLIMate! You can use CTRL+C to exit at any time :)
+
+Determining your timezone...
+
+Your timezone was detected as Australia/Sydney.
+
+Please select a location type: Local
+
+Enter a place name for your current location: qwertyuiop
+
+Searching for 'qwertyuiop' geocode info...
+
+Sorry - CLIMate couldn't find location info for 'qwertyuiop'.
+
+Try again? (Y/n) 
+```
+
